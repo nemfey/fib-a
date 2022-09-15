@@ -1,2 +1,2 @@
-# proyecto-a
+# SuperSopa
 proyecto de la asignatura de algoritmia
