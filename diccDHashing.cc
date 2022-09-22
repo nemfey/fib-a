@@ -1,1 +1,1 @@
-// diccDHashing file
+// diccDHashing
