@@ -11,6 +11,5 @@ wordSearch.o: wordSearch.cc wordSearch.hh
 	g++ -c wordSearch.cc $(OPCIONS)
 
 clean:
-	rm *.o
 	rm *.exe
-	rm *.gch
+	rm *.o
