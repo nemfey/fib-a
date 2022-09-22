@@ -1,1 +1,1 @@
-// diccTrie file
+// diccTrie
