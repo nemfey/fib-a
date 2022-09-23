@@ -5,6 +5,10 @@
 
 using namespace std;
 
+
+typedef vector<bool> BoolRow;
+typedef vector<BoolRow> BoolMatrix;
+
 //typedef vector<bool> BoolRow;
 //typedef vector<BoolRow> BoolMatrix;
 
@@ -65,17 +69,6 @@ bool WordSearch::addWordRec(int posi, int posj, const string& word, int i, PosCh
     return false;
 }
 
-bool WordSearch::remaining_positions(const BoolMatrix& posTried) {
-    
-    for(int i=0; i<posTried.size(); ++i) {
-        for(int j=0; j<posTried.size(); ++j) {
-            if(!posTried[i][j]) return true;
-        }
-    }
-
-    return false;
-}
-
 // Funciones publicas
 
 WordSearch::WordSearch(int n) {
@@ -90,21 +83,24 @@ void WordSearch::addWord(const string& word) {
     // no se me ocurre otra forma de comprobar si la posicion ya se ha mirado
     // tambien doy por hecho de que habra algun sitio por donde empezar
     // si no habria que usar otra EdD mas para controlar eso zzz
-    BoolMatrix posTried(wordSearch.size(), BoolRow(wordSearch.size(),false));
+    int n = wordSearch.size();
+    BoolMatrix posTried(n, BoolRow(n,false));
+    int posToTry = n * n;
     do {
-        posi = rand() % wordSearch.size();
-        posj = rand() % wordSearch.size();
+        posi = rand() % n;
+        posj = rand() % n;
         if (!posTried[posi][posj]) {
             
             // vector del tamano de la palabra para tener ordenados cual es la posi y posj de la ultima letra de la palabra anadida
             PosChars posChars(word.size(), {-1,-1});
             wordPlaced = addWordRec(posi, posj, word, 0, posChars);
             posTried[posi][posj] = true;
+            --posToTry;
         }
     }
-    while(!wordPlaced and remaining_positions(posTried));
+    while(!wordPlaced and posToTry>0);
 
-    if(!remaining_positions(posTried)) cout << "WORD " << word << " WAS IMPOSSIBLE TO PLACE" << endl;
+    if(posToTry==0) cout << "WORD " << word << " WAS IMPOSSIBLE TO PLACE" << endl;
 }
 
 void WordSearch::print() {

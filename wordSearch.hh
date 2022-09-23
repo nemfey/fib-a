@@ -9,8 +9,6 @@ using namespace std;
 typedef vector<char> Row;
 typedef vector<Row> Matrix;
 typedef vector<pair<int,int>> PosChars;
-typedef vector<bool> BoolRow;
-typedef vector<BoolRow> BoolMatrix;
 
 class WordSearch {
     
@@ -23,8 +21,6 @@ class WordSearch {
         bool posRepeated(int posi, int posj, const PosChars& posChars);
         
         bool addWordRec(int posi, int posj, const string& word, int n, PosChars& posChars);
-
-        bool remaining_positions(const BoolMatrix& posTried);
         
         
     public:
