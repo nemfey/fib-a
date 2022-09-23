@@ -5,14 +5,14 @@
 
 using namespace std;
 
-typedef vector<bool> BoolRow;
-typedef vector<BoolRow> BoolMatrix;
+//typedef vector<bool> BoolRow;
+//typedef vector<BoolRow> BoolMatrix;
 
 //                  NO N NE E SE S SO O
 vector<int> diri = {-1,0,1,1,1,0,-1,-1};
 vector<int> dirj = {-1,-1,-1,0,1,1,1,0};
 
-//Funciones privadas
+// Funciones privadas
 
 bool WordSearch::posOk(int posi, int posj, char c) {
     
@@ -30,40 +30,53 @@ bool WordSearch::posRepeated(int posi, int posj, const PosChars& posChars) {
     return false;
 }
 
-//empiezo a poner letras desde la última para que el problema de borrarlas si no hay hueco sea más facil
-bool WordSearch::addWordRec(int posi, int posj, const string& word, int n, PosChars& posChars) {
+// empiezo a poner letras desde la ultima para que el problema de borrarlas si no hay hueco sea mas facil
+bool WordSearch::addWordRec(int posi, int posj, const string& word, int i, PosChars& posChars) {
     
-    if (!posOk(posi, posj, word[n]) or posRepeated(posi, posj, posChars)) return false;
-    //última letra de la palabra
-    if (n == word.size() - 1) {
+    if (!posOk(posi, posj, word[i]) or posRepeated(posi, posj, posChars)) return false;
+    // ultima letra de la palabra
+    if (i == word.size() - 1) {
         
-        wordSearch[posi][posj] = word[n];
+        wordSearch[posi][posj] = word[i];
         return true;
     }
-    posChars[n] = {posi,posj};
-    //dirVisited[8] es el contador para ver si ya se han mirado las 8 direcciones
+
+    posChars[i] = {posi,posj};
+    // dirVisited[8] es el contador para ver si ya se han mirado las 8 direcciones
     vector<int> dirVisited(9,0);
-    bool charFitted = false;
+    bool charUsed = false;
     int dir;
     do {
         
         dir = rand() % 8;
-        //hasta encontrar una dirección que no se ha usado
+        // hasta encontrar una direccion que no se ha usado
         while (dirVisited[dir] == 1) dir = rand() % 8;
         dirVisited[dir] = 1;
         ++dirVisited[8];
-        charFitted = addWordRec(posi + diri[dir], posj + dirj[dir], word, n + 1, posChars);
+        charUsed = addWordRec(posi + diri[dir], posj + dirj[dir], word, i + 1, posChars);
     }
-    while(!charFitted and dirVisited[8] < 8);
-    if (charFitted) {
+    while(!charUsed and dirVisited[8] < 8);
+
+    if (charUsed) {
         
-        wordSearch[posi][posj] = word[n];
+        wordSearch[posi][posj] = word[i];
         return true;
     }
     return false;
 }
 
-//Funciones públicas
+bool WordSearch::remaining_positions(const BoolMatrix& posTried) {
+    
+    for(int i=0; i<posTried.size(); ++i) {
+        for(int j=0; j<posTried.size(); ++j) {
+            if(!posTried[i][j]) return true;
+        }
+    }
+
+    return false;
+}
+
+// Funciones publicas
 
 WordSearch::WordSearch(int n) {
     
@@ -73,24 +86,25 @@ WordSearch::WordSearch(int n) {
 void WordSearch::addWord(const string& word) {
     
     int posi, posj;
-    bool wordFitted = false;
-    //no se me ocurre otra forma de comprobar si la posición ya se ha mirado
-    //también doy por hecho de que habrá algun sitio por donde empezar
-    //si no habría que usar otra EdD más para controlar eso zzz
+    bool wordPlaced = false;
+    // no se me ocurre otra forma de comprobar si la posicion ya se ha mirado
+    // tambien doy por hecho de que habra algun sitio por donde empezar
+    // si no habria que usar otra EdD mas para controlar eso zzz
     BoolMatrix posTried(wordSearch.size(), BoolRow(wordSearch.size(),false));
     do {
-        
         posi = rand() % wordSearch.size();
         posj = rand() % wordSearch.size();
         if (!posTried[posi][posj]) {
             
-            //vector del tamaño de la palabra para tener ordenados cual es la posi y posj de la ultima letra de la palabra añadida
+            // vector del tamano de la palabra para tener ordenados cual es la posi y posj de la ultima letra de la palabra anadida
             PosChars posChars(word.size(), {-1,-1});
-            wordFitted = addWordRec(posi, posj, word, 0, posChars);
+            wordPlaced = addWordRec(posi, posj, word, 0, posChars);
             posTried[posi][posj] = true;
         }
     }
-    while(!wordFitted);
+    while(!wordPlaced and remaining_positions(posTried));
+
+    if(!remaining_positions(posTried)) cout << "WORD " << word << " WAS IMPOSSIBLE TO PLACE" << endl;
 }
 
 void WordSearch::print() {
