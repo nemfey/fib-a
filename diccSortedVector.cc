@@ -7,18 +7,35 @@
 
 using namespace std;
 
+// words must have 20 positions
+void chooseWordsFromDict(const vector<string>& dictionary, vector<string>& words) {
+    int dicSize = dictionary.size();
+    vector<int> positionsToChoose(dicSize);
+    for(int i=0; i<dicSize; ++i) positionsToChoose[i] = i;
+    
+    for(int i=0; i<20; ++i) {
+        int r = rand() % (dicSize-i);
+        words[i] = dictionary[r];
+
+        swap(dictionary[r], dictionary[dicSize - (i+1)]);
+    }
+}
+
 int main() {
     
     srand(time(NULL));
     
-    //int n = rand() % 11 + 10;
-    int n = 5;
+    vector<string> dictionary = {"abuela","arbol","bocata","bocina","son","buenas","coche","noche","silla",
+                                  "carbon","electro","iman","tapon","persiana","ventana","booleano","mesa",
+                                  "lapiz","mono","estuche","coco","palmeta","barco","avion","empirico"};
+    vector<string> words(20);
+    chooseWordsFromDict(dictionary,words);
+    
+    int n = rand() % 11 + 10;
     WordSearch wordSearch(n);
     
-    //vector<string> words = {"JOAN","POL","VICTOR","MARIO", "AMARILLO", "COCHE", "JUEGO", "NATILLA"};
-    vector<string> words = {"aaaaa","bbbbb","ccccc","ddddd","eeeee","fffff"};
-    int nWords = words.size();
-    for (int i = 0; i < nWords; i++) {
+    // always 20 words to search
+    for (int i = 0; i < 20; i++) {
         
         wordSearch.addWord(words[i]);
     }
