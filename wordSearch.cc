@@ -5,17 +5,8 @@
 
 using namespace std;
 
-<<<<<<< HEAD
 typedef vector<bool> BoolRow;
 typedef vector<BoolRow> BoolMatrix;
-=======
-
-typedef vector<bool> BoolRow;
-typedef vector<BoolRow> BoolMatrix;
-
-//typedef vector<bool> BoolRow;
-//typedef vector<BoolRow> BoolMatrix;
->>>>>>> victor
 
 //                  NO N NE E SE S SO O
 vector<int> diri = {-1,0,1,1,1,0,-1,-1};
@@ -89,13 +80,8 @@ void WordSearch::addWord(const string& word) {
     // tambien doy por hecho de que habra algun sitio por donde empezar
     // si no habria que usar otra EdD mas para controlar eso zzz
     int n = wordSearch.size();
-<<<<<<< HEAD
     int posToTry = n*n;
     BoolMatrix posTried(n, BoolRow(n,false));
-=======
-    BoolMatrix posTried(n, BoolRow(n,false));
-    int posToTry = n * n;
->>>>>>> victor
     do {
         posi = rand() % n;
         posj = rand() % n;
@@ -110,11 +96,7 @@ void WordSearch::addWord(const string& word) {
     }
     while(!wordPlaced and posToTry>0);
 
-<<<<<<< HEAD
     if(posToTry == 0) cout << "WORD " << word << " WAS IMPOSSIBLE TO PLACE" << endl;
-=======
-    if(posToTry==0) cout << "WORD " << word << " WAS IMPOSSIBLE TO PLACE" << endl;
->>>>>>> victor
 }
 
 void WordSearch::print() {
@@ -132,5 +114,5 @@ void WordSearch::print() {
             else cout << " " << c;
         }
         cout << endl;
-    }
 }
+    }
