@@ -3,12 +3,13 @@
 #include <ctime>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include "wordSearch.hh"
 
 using namespace std;
 
 // words must have 20 positions
-void chooseWordsFromDict(const vector<string>& dictionary, vector<string>& words) {
+void chooseWordsFromDict(vector<string>& dictionary, vector<string>& words) {
     int dicSize = dictionary.size();
     vector<int> positionsToChoose(dicSize);
     for(int i=0; i<dicSize; ++i) positionsToChoose[i] = i;
