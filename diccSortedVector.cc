@@ -9,7 +9,7 @@
 using namespace std;
 
 // words must have 20 positions
-void chooseWordsFromDict(vector<string>& dictionary, vector<string>& words) {
+void chooseWordsFromDict(vector<string> dictionary, vector<string>& words) {
     int dicSize = dictionary.size();
     vector<int> positionsToChoose(dicSize);
     for(int i=0; i<dicSize; ++i) positionsToChoose[i] = i;
@@ -30,6 +30,9 @@ int main() {
                                   "carbon","electro","iman","tapon","persiana","ventana","booleano","mesa",
                                   "lapiz","mono","estuche","coco","palmeta","barco","avion","empirico"};
     vector<string> words(20);
+    
+    sort(dictionary.begin(), dictionary.end());
+    
     chooseWordsFromDict(dictionary,words);
     
     int n = rand() % 11 + 10;
