@@ -9,6 +9,21 @@
 
 using namespace std;
 
+// convertir diccionario a trie
+// aplicar patricia al trie
+// backtracking
+//      caso base: estamos en hoja return palabra intermedia
+//      sino:
+//            repetir:
+//              mira si mi letra (o palabra hasta el momento formada)
+//                  forma parte del valor de un nodo vecino
+//                   -> si: vamos al vecino y lo mismo
+//                   -> sino: siguiente letra vecina (i,j)
+//                              si ninguna letra (auxiliar de visitados) backtracking se encarga :)
+
+
+
+
 //                  NO N NE E SE S SO O
 vector<int> dirI = {-1,0,1,1,1,0,-1,-1};
 vector<int> dirJ = {-1,-1,-1,0,1,1,1,0};
