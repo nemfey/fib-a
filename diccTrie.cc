@@ -12,7 +12,7 @@ using namespace std;
 // convertir diccionario a trie
 // aplicar patricia al trie
 // backtracking
-//      caso base: estamos en hoja return palabra intermedia
+//      caso base: si palabra intermedia == palabra hoja -> return palabra
 //      sino:
 //            repetir:
 //              mira si mi letra (o palabra hasta el momento formada)
