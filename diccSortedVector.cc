@@ -26,9 +26,7 @@ int main() {
     
     srand(time(NULL));
     
-    vector<string> dictionary = {"abuela","arbol","bocata","bocina","son","buenas","coche","noche","silla",
-                                  "carbon","electro","iman","tapon","persiana","ventana","booleano","mesa",
-                                  "lapiz","mono","estuche","coco","palmeta","barco","avion","empirico"};
+    vector<string> dictionary = {"ABUELO", "ARBOL", "BALON", "BICICLETA", "COLILLA", "CHORRA", "DICCIONARIO", "DORMIR", "ELECTIRCO", "ESPANYA", "FAROLA", "FUENTE", "GATO", "GORILA", "HELICOPTERO", "HORMIGA", "IGUALAR", "ISLAM", "JUEGO", "JORDAN", "KIWI", "KILO", "LIBRA", "LIMON", "MONEDA", "MESA", "NORIA", "NUBE", "ORIFICIO", "OLER", "PALOMA", "PUEBLO", "QUESO", "QUERER", "RUIDO", "RUEGO", "SORIA", "SUERTE", "TIRAR", "TITAN", "UVA", "UMBRAL", "VACACIONES", "VOLVER", "WATERPOLO", "WIKI", "XAVI", "XINO", "YOGUR", "YAYO", "ZEBRA", "ZAPATO"};
     vector<string> words(20);
     
     sort(dictionary.begin(), dictionary.end());
@@ -44,6 +42,10 @@ int main() {
         wordSearch.addWord(words[i]);
     }
 
+    sort(words.begin(), words.end());
+    int wordsSize = words.size();
+    for (int i = 0; i < wordsSize; i++) cout << words[i] << "  ";
+    cout << endl << endl;
     //aqui la sopa ya estaria creada y solo tocaria buscar las palabras
     wordSearch.print();
 }
