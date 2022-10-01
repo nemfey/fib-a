@@ -35,7 +35,7 @@ int main() {
     
     chooseWordsFromDict(dictionary,words);
     
-    int n = rand() % 11 + 10;
+    int n = rand() % 16 + 10;
     WordSearch wordSearch(n);
     
     // always 20 words to search

@@ -102,10 +102,24 @@ void WordSearch::addWord(const string& word) {
 void WordSearch::print() {
     
     int randomChar;
+    int i = 0;
     for (auto row: wordSearch) {
         
+        if (i == 0) {
+            
+            cout << "  ";
+            int n = wordSearch.size();
+            for (int k = 0; k < n; k++) {
+                
+                cout << " " << k % 10;
+            }
+            cout << endl << endl;
+        }
+        int j = 0;
         for (auto c: row) {
             
+            if (j == 0) cout << i % 10 << " ";
+            j++;
             if (c == '*') {
                 
                 randomChar = rand() % 26 + 65;
@@ -114,5 +128,6 @@ void WordSearch::print() {
             else cout << " " << c;
         }
         cout << endl;
-}
+        i++;
     }
+}
