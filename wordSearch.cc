@@ -5,13 +5,6 @@
 
 using namespace std;
 
-typedef vector<bool> BoolRow;
-typedef vector<BoolRow> BoolMatrix;
-
-//                  NO N NE E SE S SO O
-vector<int> diri = {-1,0,1,1,1,0,-1,-1};
-vector<int> dirj = {-1,-1,-1,0,1,1,1,0};
-
 // Funciones privadas
 
 bool WordSearch::posOk(int posi, int posj, char c) {
@@ -130,4 +123,9 @@ void WordSearch::print() {
         cout << endl;
         i++;
     }
+}
+
+char WordSearch::toChar(int i, int j) {
+    
+    return wordSearch[i][j];
 }

@@ -4,12 +4,16 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <list>
 #include "wordSearch.hh"
 
 using namespace std;
 
+typedef pair<string,PosChars> Result;
+
 // words must have 20 positions
 void chooseWordsFromDict(vector<string> dictionary, vector<string>& words) {
+    
     int dicSize = dictionary.size();
     vector<int> positionsToChoose(dicSize);
     for(int i=0; i<dicSize; ++i) positionsToChoose[i] = i;
@@ -20,6 +24,43 @@ void chooseWordsFromDict(vector<string> dictionary, vector<string>& words) {
 
         swap(dictionary[r], dictionary[dicSize - (i+1)]);
     }
+}
+
+int dichotomousSearch(const string& auxWord, const vector<string>& dictionary, int left, int right) {
+    
+    if (left > right) return 0;
+    int m = (left + right) / 2;
+    if (auxWord < dictionary[m]) {
+        
+        //prefix the same
+        if(dictionary[m].find(auxWord) == 0) return 1;
+        return dichotomousSearch(auxWord, dictionary, left, m - 1);
+    }
+    else if (auxWord > dictionary[m]) return dichotomousSearch(auxWord, dictionary, m + 1, right);
+    //word found
+    return 2;
+}
+
+//recursive call
+void searchingWordsRec(const vector<string>& dictionary, WordSearch& wordSearch, int n, int i, int j, list<Result>& result, BoolMatrix& visited, string& currentWord) {
+    
+    if(not visited[i][j]) {
+        
+        visited[i][j] = true;
+        string auxWord = currentWord;
+        auxWord.push_back(wordSearch.toChar(i,j));
+        int exists = dichotomousSearch(auxWord, dictionary, 0, dictionary.size());
+        if (exists == 0) return;
+        //else if (exists == 2)
+    }
+}
+
+//first call to recursive searching words
+void searchingWords(const vector<string>& dictionary, WordSearch& wordSearch, int n, int i, int j, list<Result>& result) {
+    
+    BoolMatrix visited(n, BoolRow(n, false));
+    string w = "";
+    searchingWordsRec(dictionary, wordSearch, n, i, j, result, visited, w);
 }
 
 int main() {
@@ -48,4 +89,13 @@ int main() {
     cout << endl << endl;
     //aqui la sopa ya estaria creada y solo tocaria buscar las palabras
     wordSearch.print();
+    
+    list<Result> result;
+    for(int i = 0; i < n; i++) {
+        
+        for(int j = 0; j < n; j++) {
+            
+            searchingWords(dictionary, wordSearch, n, i, j, result);
+        }
+    }
 }
