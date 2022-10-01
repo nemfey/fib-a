@@ -9,6 +9,10 @@
 
 using namespace std;
 
+//                  NO N NE E SE S SO O
+vector<int> dirI = {-1,0,1,1,1,0,-1,-1};
+vector<int> dirJ = {-1,-1,-1,0,1,1,1,0};
+
 typedef pair<string,PosChars> Result;
 
 // words must have 20 positions
@@ -42,16 +46,43 @@ int dichotomousSearch(const string& auxWord, const vector<string>& dictionary, i
 }
 
 //recursive call
-void searchingWordsRec(const vector<string>& dictionary, WordSearch& wordSearch, int n, int i, int j, list<Result>& result, BoolMatrix& visited, string& currentWord) {
+void searchingWordsRec(const vector<string>& dictionary, WordSearch& wordSearch, int i, int j, list<Result>& result, BoolMatrix& visited, string& currentWord, PosChars& auxPos) {
     
     if(not visited[i][j]) {
         
         visited[i][j] = true;
+        //creamos string auxiliar para ver si el nuevo prefijo existe
         string auxWord = currentWord;
         auxWord.push_back(wordSearch.toChar(i,j));
-        int exists = dichotomousSearch(auxWord, dictionary, 0, dictionary.size());
-        if (exists == 0) return;
-        //else if (exists == 2)
+        int exists = dichotomousSearch(auxWord, dictionary, 0, dictionary.size()-1);
+        int auxI, auxJ;
+        // existe la palabra entera
+        if (exists == 2) {
+            
+            auxPos.push_back({i,j});
+            result.push_back({auxWord,auxPos});
+            //llamada recursiva
+            for(int k = 0; k < 8; k++) {
+                
+                auxI = i + dirI[k];
+                auxJ = j + dirJ[k];
+                if(wordSearch.posOk(auxI,auxJ)) searchingWordsRec(dictionary, wordSearch, auxI, auxJ, result, visited, auxWord, auxPos);
+            }
+            auxPos.pop_back();
+        }
+        //existe el prefijo
+        else if (exists == 1){
+            
+            auxPos.push_back({i,j});
+            for(int k = 0; k < 8; k++) {
+                
+                auxI = i + dirI[k];
+                auxJ = j + dirJ[k];
+                if(wordSearch.posOk(auxI,auxJ)) searchingWordsRec(dictionary, wordSearch, auxI, auxJ, result, visited, auxWord, auxPos);
+            }
+            auxPos.pop_back();
+        }
+        visited[i][j] = false;
     }
 }
 
@@ -60,7 +91,8 @@ void searchingWords(const vector<string>& dictionary, WordSearch& wordSearch, in
     
     BoolMatrix visited(n, BoolRow(n, false));
     string w = "";
-    searchingWordsRec(dictionary, wordSearch, n, i, j, result, visited, w);
+    PosChars auxPos;
+    searchingWordsRec(dictionary, wordSearch, i, j, result, visited, w, auxPos);
 }
 
 int main() {
@@ -97,5 +129,20 @@ int main() {
             
             searchingWords(dictionary, wordSearch, n, i, j, result);
         }
+    }
+    
+    cout << endl << "WORDS FOUND" << endl << "------------------------------------------------------------" << endl;
+    list<Result>::const_iterator it;
+    for(it = result.begin(); it!= result.end(); ++it) {
+        
+        Result r = *it;
+        cout << r.first << " -> ";
+        int vsize = r.second.size();
+        for (int i = 0; i < vsize; i++) {
+            
+            cout << '{' << r.second[i].first << ',' << r.second[i].second << "}";
+            if(i != vsize -1) cout << " , ";
+        }
+        cout << endl;
     }
 }

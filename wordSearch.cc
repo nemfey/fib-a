@@ -5,6 +5,10 @@
 
 using namespace std;
 
+//                  NO N NE E SE S SO O
+vector<int> diri = {-1,0,1,1,1,0,-1,-1};
+vector<int> dirj = {-1,-1,-1,0,1,1,1,0};
+
 // Funciones privadas
 
 bool WordSearch::posOk(int posi, int posj, char c) {
@@ -112,13 +116,14 @@ void WordSearch::print() {
         for (auto c: row) {
             
             if (j == 0) cout << i % 10 << " ";
-            j++;
             if (c == '*') {
                 
                 randomChar = rand() % 26 + 65;
                 cout << " " << char(randomChar);
+                wordSearch[i][j] = char(randomChar);
             }
             else cout << " " << c;
+            j++;
         }
         cout << endl;
         i++;
@@ -129,3 +134,10 @@ char WordSearch::toChar(int i, int j) {
     
     return wordSearch[i][j];
 }
+
+bool WordSearch::posOk(int i, int j) {
+    
+    if (i < 0 or j < 0 or i >= wordSearch.size() or j >= wordSearch.size()) return false;
+    return true;
+}
+
