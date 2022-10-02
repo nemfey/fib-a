@@ -25,6 +25,7 @@ class Trie {
         bool search(string);
         bool existChildrenWithKey(string);
         Trie* nodeWithKey(string);
+        void patricia();
 
         //bool deletion(Trie*&, string);
         //void patricia();
