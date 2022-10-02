@@ -1,5 +1,11 @@
 OPCIONS = -D_GLIBCXX_DEBUG -O2 -Wall -Wextra -Werror -Wno-sign-compare -std=c++11
 
+diccTrie.exe: diccTrie.o wordSearch.o 
+	g++ -o diccTrie.exe diccTrie.o wordSearch.o 
+
+diccTrie.o: diccTrie.cc wordSearch.hh 
+	g++ -c diccTrie.cc $(OPCIONS)
+
 diccSortedVector.exe: diccSortedVector.o wordSearch.o 
 	g++ -o diccSortedVector.exe diccSortedVector.o wordSearch.o 
 

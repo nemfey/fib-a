@@ -9,6 +9,158 @@
 
 using namespace std;
 
+// Define the character size
+#define CHAR_SIZE 128
+
+//                  NO N NE E SE S SO O
+vector<int> dirI = {-1,0,1,1,1,0,-1,-1};
+vector<int> dirJ = {-1,-1,-1,0,1,1,1,0};
+
+typedef pair<string,PosChars> Result;
+
+class Trie
+{
+public:
+    bool isLeaf;
+    Trie* character[CHAR_SIZE];
+ 
+    // Constructor
+    Trie()
+    {
+        this->isLeaf = false;
+ 
+        for (int i = 0; i < CHAR_SIZE; i++) {
+            this->character[i] = nullptr;
+        }
+    }
+ 
+    void insert(string);
+    bool deletion(Trie*&, string);
+    bool search(string);
+    bool haveChildren(Trie const*);
+};
+ 
+// Iterative function to insert a key into a Trie
+void Trie::insert(string key)
+{
+    // start from the root node
+    Trie* curr = this;
+    for (int i = 0; i < key.length(); i++)
+    {
+        unsigned char c = key[i];
+        // create a new node if the path doesn't exist
+        if (curr->character[c] == nullptr) {
+            curr->character[c] = new Trie();
+        }
+ 
+        // go to the next node
+        curr = curr->character[c];
+    }
+ 
+    // mark the current node as a leaf
+    curr->isLeaf = true;
+}
+ 
+// Iterative function to search a key in a Trie. It returns true
+// if the key is found in the Trie; otherwise, it returns false
+bool Trie::search(string key)
+{
+    // return false if Trie is empty
+    /*
+    if (this == nullptr) {
+        return false;
+    }
+    */
+    Trie* curr = this;
+    for (int i = 0; i < key.length(); i++)
+    {
+        unsigned char c = key[i];
+        // go to the next node
+        curr = curr->character[c];
+ 
+        // if the string is invalid (reached end of a path in the Trie)
+        if (curr == nullptr) {
+            return false;
+        }
+    }
+ 
+    // return true if the current node is a leaf and the
+    // end of the string is reached
+    return curr->isLeaf;
+}
+ 
+// Returns true if a given node has any children
+bool Trie::haveChildren(Trie const* curr)
+{
+    for (int i = 0; i < CHAR_SIZE; i++)
+    {
+        if (curr->character[i]) {
+            return true;    // child found
+        }
+    }
+ 
+    return false;
+}
+ 
+// Recursive function to delete a key in the Trie
+bool Trie::deletion(Trie*& curr, string key)
+{
+    // return if Trie is empty
+    if (curr == nullptr) {
+        return false;
+    }
+ 
+    // if the end of the key is not reached
+    if (key.length())
+    {
+        unsigned char c = key[0];
+        // recur for the node corresponding to the next character in the key
+        // and if it returns true, delete the current node (if it is non-leaf)
+ 
+        if (curr != nullptr &&
+            curr->character[c] != nullptr &&
+            deletion(curr->character[c], key.substr(1)) &&
+            curr->isLeaf == false)
+        {
+            if (!haveChildren(curr))
+            {
+                delete curr;
+                curr = nullptr;
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    }
+ 
+    // if the end of the key is reached
+    if (key.length() == 0 && curr->isLeaf)
+    {
+        // if the current node is a leaf node and doesn't have any children
+        if (!haveChildren(curr))
+        {
+            // delete the current node
+            delete curr;
+            curr = nullptr;
+ 
+            // delete the non-leaf parent nodes
+            return true;
+        }
+ 
+        // if the current node is a leaf node and has children
+        else {
+            // mark the current node as a non-leaf node (DON'T DELETE IT)
+            curr->isLeaf = false;
+ 
+            // don't delete its parent nodes
+            return false;
+        }
+    }
+ 
+    return false;
+}
+
 // convertir diccionario a trie
 // aplicar patricia al trie
 // backtracking
@@ -21,16 +173,8 @@ using namespace std;
 //                   -> sino: siguiente letra vecina (i,j)
 //                              si ninguna letra (auxiliar de visitados) backtracking se encarga :)
 
-
-
-
-//                  NO N NE E SE S SO O
-vector<int> dirI = {-1,0,1,1,1,0,-1,-1};
-vector<int> dirJ = {-1,-1,-1,0,1,1,1,0};
-
-typedef pair<string,PosChars> Result;
-
 // words must have 20 positions
+
 void chooseWordsFromDict(vector<string> dictionary, vector<string>& words) {
     
     int dicSize = dictionary.size();
@@ -115,28 +259,25 @@ int main() {
     srand(time(NULL));
     
     vector<string> dictionary = {"ABUELO", "ARBOL", "BALON", "BICICLETA", "COLILLA", "CHORRA", "DICCIONARIO", "DORMIR", "ELECTIRCO", "ESPANYA", "FAROLA", "FUENTE", "GATO", "GORILA", "HELICOPTERO", "HORMIGA", "IGUALAR", "ISLAM", "JUEGO", "JORDAN", "KIWI", "KILO", "LIBRA", "LIMON", "MONEDA", "MESA", "NORIA", "NUBE", "ORIFICIO", "OLER", "PALOMA", "PUEBLO", "QUESO", "QUERER", "RUIDO", "RUEGO", "SORIA", "SUERTE", "TIRAR", "TITAN", "UVA", "UMBRAL", "VACACIONES", "VOLVER", "WATERPOLO", "WIKI", "XAVI", "XINO", "YOGUR", "YAYO", "ZEBRA", "ZAPATO"};
-    vector<string> words(20);
-    
     sort(dictionary.begin(), dictionary.end());
     
+    vector<string> words(20);
     chooseWordsFromDict(dictionary,words);
     
+    // create empty wordSearch
     int n = rand() % 16 + 10;
-    WordSearch wordSearch(n);
-    
-    // always 20 words to search
+    WordSearch wordSearch(n);   
+    // initialize the wordSearch
     for (int i = 0; i < 20; i++) {
-        
         wordSearch.addWord(words[i]);
     }
 
-    sort(words.begin(), words.end());
     int wordsSize = words.size();
     for (int i = 0; i < wordsSize; i++) cout << words[i] << "  ";
     cout << endl << endl;
     //aqui la sopa ya estaria creada y solo tocaria buscar las palabras
     wordSearch.print();
-    
+    /*
     list<Result> result;
     for(int i = 0; i < n; i++) {
         
@@ -159,5 +300,7 @@ int main() {
             if(i != vsize -1) cout << " , ";
         }
         cout << endl;
+        
     }
+    */
 }
