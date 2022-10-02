@@ -9,31 +9,13 @@ using namespace std;
 vector<int> diri = {-1,0,1,1,1,0,-1,-1};
 vector<int> dirj = {-1,-1,-1,0,1,1,1,0};
 
-// Funciones privadas
-
-bool WordSearch::posOk(int posi, int posj, char c) {
-    
-    if (posi < 0 or posj < 0 or posi >= wordSearch.size() or posj >= wordSearch.size()) return false;
-    if (wordSearch[posi][posj] == '*' or wordSearch[posi][posj] == c) return true;
-    return false;
-}
-
-bool WordSearch::posRepeated(int posi, int posj, const PosChars& posChars) {
-    
-    for (auto pos: posChars) {
-        
-        if (pos.first == posi and pos.second == posj) return true;
-    }
-    return false;
-}
-
+// Private functions
 // empiezo a poner letras desde la ultima para que el problema de borrarlas si no hay hueco sea mas facil
 bool WordSearch::addWordRec(int posi, int posj, const string& word, int i, PosChars& posChars) {
     
     if (!posOk(posi, posj, word[i]) or posRepeated(posi, posj, posChars)) return false;
     // ultima letra de la palabra
-    if (i == word.size() - 1) {
-        
+    if (i == word.size() - 1) {   
         wordSearch[posi][posj] = word[i];
         return true;
     }
@@ -43,8 +25,7 @@ bool WordSearch::addWordRec(int posi, int posj, const string& word, int i, PosCh
     vector<int> dirVisited(9,0);
     bool charUsed = false;
     int dir;
-    do {
-        
+    do {     
         dir = rand() % 8;
         // hasta encontrar una direccion que no se ha usado
         while (dirVisited[dir] == 1) dir = rand() % 8;
@@ -54,23 +35,37 @@ bool WordSearch::addWordRec(int posi, int posj, const string& word, int i, PosCh
     }
     while(!charUsed and dirVisited[8] < 8);
 
-    if (charUsed) {
-        
+    if (charUsed) {      
         wordSearch[posi][posj] = word[i];
         return true;
     }
+
     return false;
 }
+
+bool WordSearch::posOk(int posi, int posj, char c) {
+    if (posi < 0 or posj < 0 or posi >= wordSearch.size() or posj >= wordSearch.size()) return false;
+    if (wordSearch[posi][posj] == '*' or wordSearch[posi][posj] == c) return true;
+
+    return false;
+}
+
+bool WordSearch::posRepeated(int posi, int posj, const PosChars& posChars) { 
+    for (auto pos: posChars) {  
+        if (pos.first == posi and pos.second == posj) return true;
+    }
+
+    return false;
+}
+
 
 // Funciones publicas
 
 WordSearch::WordSearch(int n) {
-    
     wordSearch = Matrix(n, Row(n,'*'));
 }
 
 void WordSearch::addWord(const string& word) {
-    
     int posi, posj;
     bool wordPlaced = false;
     // no se me ocurre otra forma de comprobar si la posicion ya se ha mirado
@@ -83,7 +78,6 @@ void WordSearch::addWord(const string& word) {
         posi = rand() % n;
         posj = rand() % n;
         if (!posTried[posi][posj]) {
-            
             // vector del tamano de la palabra para tener ordenados cual es la posi y posj de la ultima letra de la palabra anadida
             PosChars posChars(word.size(), {-1,-1});
             wordPlaced = addWordRec(posi, posj, word, 0, posChars);
@@ -96,28 +90,35 @@ void WordSearch::addWord(const string& word) {
     if(posToTry == 0) cout << "WORD " << word << " WAS IMPOSSIBLE TO PLACE" << endl;
 }
 
+bool WordSearch::posOk(int i, int j) {
+    if (i < 0 or j < 0 or i >= wordSearch.size() or j >= wordSearch.size()) return false;
+    return true;
+}
+
+int WordSearch::getSize() {
+    return wordSearch.size();
+}
+
+char WordSearch::toChar(int i, int j) {
+    return wordSearch[i][j];
+}
+
 void WordSearch::print() {
-    
     int randomChar;
     int i = 0;
-    for (auto row: wordSearch) {
-        
-        if (i == 0) {
-            
+    for (auto row: wordSearch) {      
+        if (i == 0) {  
             cout << "  ";
             int n = wordSearch.size();
-            for (int k = 0; k < n; k++) {
-                
+            for (int k = 0; k < n; k++) {   
                 cout << " " << k % 10;
             }
             cout << endl << endl;
         }
         int j = 0;
         for (auto c: row) {
-            
             if (j == 0) cout << i % 10 << " ";
             if (c == '*') {
-                
                 randomChar = rand() % 26 + 65;
                 cout << " " << char(randomChar);
                 wordSearch[i][j] = char(randomChar);
@@ -129,15 +130,3 @@ void WordSearch::print() {
         i++;
     }
 }
-
-char WordSearch::toChar(int i, int j) {
-    
-    return wordSearch[i][j];
-}
-
-bool WordSearch::posOk(int i, int j) {
-    
-    if (i < 0 or j < 0 or i >= wordSearch.size() or j >= wordSearch.size()) return false;
-    return true;
-}
-
