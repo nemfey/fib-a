@@ -1,5 +1,6 @@
 #include "Trie.hh"
 #include <iostream>
+#include <string>
 using namespace std;
  
 // Define the character size
@@ -10,64 +11,48 @@ void Trie::insert(string key)
 {
     // start from the root node
     Trie* curr = this;
+    string s = "";
     for (int i = 0; i < key.length(); i++)
     {
-        unsigned char c = key[i];
-        // create a new node if the path doesn't exist
-        if (curr->character[c] == nullptr) {
-            curr->character[c] = new Trie();
+        s.push_back(key[i]);
+        if(curr->children.find(s) == curr->children.end()) {
+            curr->children.insert({s,new Trie()});
         }
- 
-        // go to the next node
-        curr = curr->character[c];
+        curr = curr->children.find(s)->second;
+        s = ""; // insert only char
     }
- 
     // mark the current node as a leaf
     curr->isLeaf = true;
 }
- 
-// Iterative function to search a key in a Trie. It returns true
-// if the key is found in the Trie; otherwise, it returns false
+
 bool Trie::search(string key)
 {
-    // return false if Trie is empty
-    /*
-    if (this == nullptr) {
-        return false;
-    }
-    */
-    
+    // start from the root node
     Trie* curr = this;
+    string s = "";
     for (int i = 0; i < key.length(); i++)
     {
-        unsigned char c = key[i];
-        // go to the next node
-        curr = curr->character[c];
- 
-        // if the string is invalid (reached end of a path in the Trie)
-        if (curr == nullptr) {
-            return false;
+        s.push_back(key[i]);
+
+        if(curr->children.find(s) != curr->children.end()) {
+            curr = curr->children.find(s)->second;
+            s = "";
         }
     }
- 
-    // return true if the current node is a leaf and the
-    // end of the string is reached
+    // mark the current node as a leaf
     return curr->isLeaf;
 }
- 
-// Returns true if a given node has any children
-bool Trie::haveChildren(Trie const* curr)
-{
-    for (int i = 0; i < CHAR_SIZE; i++)
-    {
-        if (curr->character[i]) {
-            return true;    // child found
-        }
-    }
- 
-    return false;
+
+bool Trie::existChildrenWithKey(string key) {
+    Trie* curr = this;
+    return (curr->children.find(key) != curr->children.end());
 }
- 
+
+Trie* Trie::nodeWithKey(string key) {
+    Trie* curr = this;
+    return curr->children.find(key)->second;
+}
+/*
 // Recursive function to delete a key in the Trie
 bool Trie::deletion(Trie*& curr, string key)
 {
@@ -130,11 +115,9 @@ bool Trie::deletion(Trie*& curr, string key)
 Trie* Trie::nodeOf(string key)
 {
     // return false if Trie is empty
-    /*
-    if (this == nullptr) {
-        return false;
-    }
-    */
+    //if (this == nullptr) {
+    //    return false;
+    //}
     
     Trie* curr = this;
     for (int i = 0; i < key.length(); i++)
@@ -155,5 +138,6 @@ Trie* Trie::nodeOf(string key)
 }
 
 void Trie::patricia() {
-    
+
 }
+*/

@@ -61,12 +61,12 @@ int dichotomousSearch(const string& auxWord, const vector<string>& dictionary, i
 }
 
 //recursive call
-void searchingWordsRec(Trie*& dictionary, WordSearch& wordSearch, int i, int j, list<Result>& result, BoolMatrix& visited, string& currentWord, PosChars& auxPos) {
+void searchingWordsRec(Trie*& dictionary, WordSearch& wordSearch, int i, int j, list<Result>& result, BoolMatrix& visited, string partialWord, string finalWord, PosChars& auxPos) {
     
     if(not visited[i][j]) {
         visited[i][j] = true;
         // creamos string auxiliar para ver si el nuevo prefijo existe
-        string auxWord = currentWord;
+        string auxWord = partialWord;
         auxWord.push_back(wordSearch.toChar(i,j)); // partial word + current char(i,j)
         
         //Posiciones que se verán después
@@ -76,25 +76,40 @@ void searchingWordsRec(Trie*& dictionary, WordSearch& wordSearch, int i, int j, 
         // int exists = dichotomousSearch(auxWord, dictionary, 0, dictionary.size()-1);
         if (dictionary->search(auxWord)) {
             auxPos.push_back({i,j});
-            result.push_back({auxWord,auxPos});
+            finalWord.push_back(wordSearch.toChar(i,j));
+            result.push_back({finalWord,auxPos});
             // llamada recursiva
+            /*
             for(int k = 0; k < 8; k++) {         
                 auxI = i + dirI[k];
                 auxJ = j + dirJ[k];
                 if(wordSearch.posOk(auxI,auxJ)) searchingWordsRec(dictionary, wordSearch, auxI, auxJ, result, visited, auxWord, auxPos);
             }
             auxPos.pop_back();
+            */
         }
-        else if(dictionary->nodeOf(auxWord) != nullptr) {
+        else if(dictionary->existChildrenWithKey(auxWord)) {
             auxPos.push_back({i,j});
+            Trie* childrenDictionary = dictionary->nodeWithKey(auxWord);
             //llamada recursiva
             for(int k = 0; k < 8; k++) {         
                 auxI = i + dirI[k];
                 auxJ = j + dirJ[k];
-                if(wordSearch.posOk(auxI,auxJ)) searchingWordsRec(dictionary, wordSearch, auxI, auxJ, result, visited, auxWord, auxPos);
+                string resetWord = "";
+                string someFinalWord = finalWord;
+                someFinalWord.push_back(wordSearch.toChar(i,j));
+                if(wordSearch.posOk(auxI,auxJ)) searchingWordsRec(childrenDictionary, wordSearch, auxI, auxJ, result, visited, resetWord, someFinalWord, auxPos);
             }
             auxPos.pop_back();
+            //actualizar dictionary -> dic->children.find(auxword) y reset palabra
         }
+        //else if prefijo de alguna key patricia
+
+        //    ->  e->s->p->a   -> nya
+        //                  -> t
+        //                          ->ula
+        //                           ->illa
+        //espa              t       
 
         visited[i][j] = false;
     }
@@ -104,9 +119,10 @@ void searchingWordsRec(Trie*& dictionary, WordSearch& wordSearch, int i, int j, 
 void searchingWords(Trie*& dictionary, WordSearch& wordSearch, int n, int i, int j, list<Result>& result) {
     
     BoolMatrix visited(n, BoolRow(n, false));
-    string w = ""; // partial word
+    string finalWord = "";
+    string partialWord = ""; // partial word
     PosChars auxPos; // ???
-    searchingWordsRec(dictionary, wordSearch, i, j, result, visited, w, auxPos);
+    searchingWordsRec(dictionary, wordSearch, i, j, result, visited, partialWord, finalWord, auxPos);
 }
 
 int main() {
@@ -138,6 +154,13 @@ int main() {
     for (int i = 0; i < dictionary.size(); ++i) {
         trieDictionary->insert(dictionary[i]);
     }
+    /*
+    cout << trieDictionary->search("E") << endl;
+    cout << trieDictionary->existChildrenWithKey("E") << endl;
+    cout << trieDictionary->search("ESPANYA") << endl;
+    cout << trieDictionary->existChildrenWithKey("ESPANYA") << endl;
+    */
+
     
     list<Result> result; // words found
     for(int i = 0; i < n; i++) {      

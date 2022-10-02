@@ -1,35 +1,31 @@
 #include <iostream>
+#include <string>
+#include <map>
 
 using namespace std;
 
 // Define the character size
 #define CHAR_SIZE 128
 
-typedef vector<char> Row;
-typedef vector<Row> Matrix;
-typedef vector<pair<int,int>> PosChars;
-typedef vector<bool> BoolRow;
-typedef vector<BoolRow> BoolMatrix;
-
 class Trie {
     public:
+        //string word;
         bool isLeaf;
-        Trie* character[CHAR_SIZE];
+        map<string,Trie*> children;
+        //Trie* character[CHAR_SIZE];
     
         // Constructor
         Trie()
         {
             this->isLeaf = false;
-    
-            for (int i = 0; i < CHAR_SIZE; i++) {
-                this->character[i] = nullptr;
-            }
+            //this->children;
         }
 
         void insert(string);
-        bool deletion(Trie*&, string);
         bool search(string);
-        bool haveChildren(Trie const*);
-        Trie* nodeOf(string);
-        void patricia();
+        bool existChildrenWithKey(string);
+        Trie* nodeWithKey(string);
+
+        //bool deletion(Trie*&, string);
+        //void patricia();
 };
