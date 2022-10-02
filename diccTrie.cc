@@ -6,8 +6,10 @@
 #include <algorithm>
 #include <list>
 #include "wordSearch.hh"
+#include "Trie.hh"
 
 using namespace std;
+
 
 //                  NO N NE E SE S SO O
 vector<int> dirI = {-1,0,1,1,1,0,-1,-1};
@@ -59,52 +61,51 @@ int dichotomousSearch(const string& auxWord, const vector<string>& dictionary, i
 }
 
 //recursive call
-void searchingWordsRec(const vector<string>& dictionary, WordSearch& wordSearch, int i, int j, list<Result>& result, BoolMatrix& visited, string& currentWord, PosChars& auxPos) {
+void searchingWordsRec(Trie*& dictionary, WordSearch& wordSearch, int i, int j, list<Result>& result, BoolMatrix& visited, string& currentWord, PosChars& auxPos) {
     
     if(not visited[i][j]) {
-        
         visited[i][j] = true;
-        //creamos string auxiliar para ver si el nuevo prefijo existe
+        // creamos string auxiliar para ver si el nuevo prefijo existe
         string auxWord = currentWord;
-        auxWord.push_back(wordSearch.toChar(i,j));
-        int exists = dichotomousSearch(auxWord, dictionary, 0, dictionary.size()-1);
+        auxWord.push_back(wordSearch.toChar(i,j)); // partial word + current char(i,j)
+        
+        //Posiciones que se verán después
         int auxI, auxJ;
-        // existe la palabra entera
-        if (exists == 2) {
-            
+        
+        // Comprobamos si existe la palabra completa en el diccionario
+        // int exists = dichotomousSearch(auxWord, dictionary, 0, dictionary.size()-1);
+        if (dictionary->search(auxWord)) {
             auxPos.push_back({i,j});
             result.push_back({auxWord,auxPos});
-            //llamada recursiva
-            for(int k = 0; k < 8; k++) {
-                
+            // llamada recursiva
+            for(int k = 0; k < 8; k++) {         
                 auxI = i + dirI[k];
                 auxJ = j + dirJ[k];
                 if(wordSearch.posOk(auxI,auxJ)) searchingWordsRec(dictionary, wordSearch, auxI, auxJ, result, visited, auxWord, auxPos);
             }
             auxPos.pop_back();
         }
-        //existe el prefijo
-        else if (exists == 1){
-            
+        else if(dictionary->nodeOf(auxWord) != nullptr) {
             auxPos.push_back({i,j});
-            for(int k = 0; k < 8; k++) {
-                
+            //llamada recursiva
+            for(int k = 0; k < 8; k++) {         
                 auxI = i + dirI[k];
                 auxJ = j + dirJ[k];
                 if(wordSearch.posOk(auxI,auxJ)) searchingWordsRec(dictionary, wordSearch, auxI, auxJ, result, visited, auxWord, auxPos);
             }
             auxPos.pop_back();
         }
+
         visited[i][j] = false;
     }
 }
 
 //first call to recursive searching words
-void searchingWords(const vector<string>& dictionary, WordSearch& wordSearch, int n, int i, int j, list<Result>& result) {
+void searchingWords(Trie*& dictionary, WordSearch& wordSearch, int n, int i, int j, list<Result>& result) {
     
     BoolMatrix visited(n, BoolRow(n, false));
-    string w = "";
-    PosChars auxPos;
+    string w = ""; // partial word
+    PosChars auxPos; // ???
     searchingWordsRec(dictionary, wordSearch, i, j, result, visited, w, auxPos);
 }
 
@@ -131,13 +132,17 @@ int main() {
     cout << endl << endl;
     //aqui la sopa ya estaria creada y solo tocaria buscar las palabras
     wordSearch.print();
-    /*
-    list<Result> result;
-    for(int i = 0; i < n; i++) {
-        
-        for(int j = 0; j < n; j++) {
-            
-            searchingWords(dictionary, wordSearch, n, i, j, result);
+
+    //Mutate dictionary into Trie
+    Trie* trieDictionary = new Trie();
+    for (int i = 0; i < dictionary.size(); ++i) {
+        trieDictionary->insert(dictionary[i]);
+    }
+    
+    list<Result> result; // words found
+    for(int i = 0; i < n; i++) {      
+        for(int j = 0; j < n; j++) {           
+            searchingWords(trieDictionary, wordSearch, n, i, j, result);
         }
     }
     
@@ -156,5 +161,4 @@ int main() {
         cout << endl;
         
     }
-    */
 }

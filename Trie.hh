@@ -12,22 +12,24 @@ typedef vector<bool> BoolRow;
 typedef vector<BoolRow> BoolMatrix;
 
 class Trie {
+    public:
+        bool isLeaf;
+        Trie* character[CHAR_SIZE];
     
-    bool isLeaf;
-    Trie* character[CHAR_SIZE];
- 
-    // Constructor
-    Trie()
-    {
-        this->isLeaf = false;
- 
-        for (int i = 0; i < CHAR_SIZE; i++) {
-            this->character[i] = nullptr;
+        // Constructor
+        Trie()
+        {
+            this->isLeaf = false;
+    
+            for (int i = 0; i < CHAR_SIZE; i++) {
+                this->character[i] = nullptr;
+            }
         }
-    }
- 
-    void insert(string);
-    bool deletion(Trie*&, string);
-    bool search(string);
-    bool haveChildren(Trie const*);
+
+        void insert(string);
+        bool deletion(Trie*&, string);
+        bool search(string);
+        bool haveChildren(Trie const*);
+        Trie* nodeOf(string);
+        void patricia();
 };

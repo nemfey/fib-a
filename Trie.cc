@@ -36,6 +36,7 @@ bool Trie::search(string key)
         return false;
     }
     */
+    
     Trie* curr = this;
     for (int i = 0; i < key.length(); i++)
     {
@@ -124,4 +125,35 @@ bool Trie::deletion(Trie*& curr, string key)
     }
  
     return false;
+}
+
+Trie* Trie::nodeOf(string key)
+{
+    // return false if Trie is empty
+    /*
+    if (this == nullptr) {
+        return false;
+    }
+    */
+    
+    Trie* curr = this;
+    for (int i = 0; i < key.length(); i++)
+    {
+        unsigned char c = key[i];
+        // go to the next node
+        curr = curr->character[c];
+ 
+        // if the string is invalid (reached end of a path in the Trie)
+        if (curr == nullptr) {
+            return nullptr;
+        }
+    }
+ 
+    // return true if the current node is a leaf and the
+    // end of the string is reached
+    return curr;
+}
+
+void Trie::patricia() {
+    
 }
