@@ -110,12 +110,21 @@ int main() {
     // word search created
     wordSearch.print();
 
+    dictionary = {"A1ZBAAHSDKHS"};
     // initialize the trie with words from dictionary
     Trie* trie = new Trie();
     for (int i = 0; i < dictionary.size(); ++i) {
         trie->insert(dictionary[i]);
     }
-    
+    cout << "a" << endl;
+    // apply Patricia to trie
+    trie->patricia();
+    cout << "b" << endl;
+
+    for(auto it = trie->children.begin(); it!=trie->children.end(); ++it) {
+        cout << "ar: " << it->first << " val: " << it->second->word << endl;
+    }
+
     // find all the words
     list<Result> wordsFound;
     for(int i = 0; i < n; i++) {      

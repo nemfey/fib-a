@@ -4,20 +4,21 @@
 
 using namespace std;
 
-// Define the character size
-#define CHAR_SIZE 128
-
 class Trie {
+    private:
+        int numberChildren();
+    
     public:
-        //string word;
-        bool isLeaf;
+        string word;
+        bool isCompleteWord;
         map<string,Trie*> children;
         //Trie* character[CHAR_SIZE];
     
         // Constructor
         Trie()
         {
-            this->isLeaf = false;
+            word = "";
+            this->isCompleteWord = false;
             //this->children;
         }
 
