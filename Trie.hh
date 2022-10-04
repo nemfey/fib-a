@@ -12,14 +12,12 @@ class Trie {
         string word;
         bool isCompleteWord;
         map<string,Trie*> children;
-        //Trie* character[CHAR_SIZE];
     
         // Constructor
         Trie()
         {
-            word = "_";
+            word = "";
             this->isCompleteWord = false;
-            //this->children;
         }
 
         void insert(string);
@@ -28,7 +26,4 @@ class Trie {
         bool existsChildWithKeyPrefix(string);
         Trie* nodeWithKey(string);
         void patricia();
-
-        //bool deletion(Trie*&, string);
-        //void patricia();
 };

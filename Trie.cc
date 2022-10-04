@@ -28,7 +28,6 @@ void Trie::insert(string key)
         }
         curr = curr->children.find(s)->second;
         curr->word = s; // node has value
-        //s = ""; // insert only char
     }
     // mark the current node as a leaf
     curr->isCompleteWord = true;
@@ -91,7 +90,6 @@ void Trie::patricia() {
                 it->second->patricia();
                 string newName = it->second->word;
                 Trie* newTrie = it->second;
-                //curr->children.insert({newName,newTrie});
                 curr->children.erase(it++);
                 newChildren.insert({newName,newTrie});
             }

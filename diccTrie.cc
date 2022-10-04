@@ -31,10 +31,6 @@ void chooseWordsFromDictionary(vector<string> dictionary, vector<string>& words)
     }
 }
 
-void searchWordRec() {
-    // backtracking for searching a single word
-}
-
 // Recursive call
 void searchDictionaryWordsRec(WordSearch& wordSearch, BoolMatrix& visited, Trie*& dictionary, list<Result>& result, PosChars& auxPos, string partialWord, string finalWord, int i, int j) {   
     if(not visited[i][j]) {
@@ -72,29 +68,14 @@ void searchDictionaryWordsRec(WordSearch& wordSearch, BoolMatrix& visited, Trie*
                 nexti = i + dirI[k];
                 nextj = j + dirJ[k];
                 finalWord.push_back(wordSearch.toChar(i,j));
-                //partialWord.push_back(wordSearch.toChar(i,j));
                 if(wordSearch.posOk(nexti,nextj)) {
                     searchDictionaryWordsRec(wordSearch, visited, dictionary, result, auxPos, partialWord, finalWord, nexti, nextj);
                 }
                 finalWord.pop_back();
-                //partialWord.pop_back();
 
             }
             auxPos.pop_back();
         }
-
-        //}
-        //else if prefijo de alguna key patricia
-        //  llamar a otro backtracking para buscar la key en la sopa de letras
-        //      searchWordRec()
-
-        //    ->  e->s->p->a   -> nya
-        //                  -> t
-        //                          ->ula
-        //                           ->illa
-        //  c d s
-        //  d e s
-        //  f d p
         partialWord.pop_back();
         visited[i][j] = false;
     }
@@ -128,8 +109,6 @@ int main() {
     // word search created
     wordSearch.print();
 
-    //dictionary = {"ARBOL","ABUELO","ABRA","ABRAZO","CARCEL","CARA","Z","ABRAS","ABRASAR","ZZ","Z","NOVIO"};
-    //dictionary = {"ABUELO","ARBOL","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
     // initialize the trie with words from dictionary
     Trie* trie = new Trie();
     for (int i = 0; i < dictionary.size(); ++i) {
