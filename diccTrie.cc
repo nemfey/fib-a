@@ -66,6 +66,22 @@ void searchDictionaryWordsRec(WordSearch& wordSearch, BoolMatrix& visited, Trie*
             }
             auxPos.pop_back();
         }
+        else if(dictionary->existsChildWithKeyPrefix(partialWord)) {
+            int nexti, nextj;
+            for(int k = 0; k < 8; k++) {         
+                nexti = i + dirI[k];
+                nextj = j + dirJ[k];
+                finalWord.push_back(wordSearch.toChar(i,j));
+                partialWord = finalWord;
+                if(wordSearch.posOk(nexti,nextj)) {
+                    searchDictionaryWordsRec(wordSearch, visited, dictionary, result, auxPos, partialWord, finalWord, nexti, nextj);
+                }
+                finalWord.pop_back();
+
+            }
+        }
+
+        //}
         //else if prefijo de alguna key patricia
         //  llamar a otro backtracking para buscar la key en la sopa de letras
         //      searchWordRec()
@@ -110,19 +126,21 @@ int main() {
     // word search created
     wordSearch.print();
 
-    dictionary = {"A1ZBAAHSDKHS"};
+    //dictionary = {"ARBOL","ABUELO","ABRA","ABRAZO","CARCEL","CARA","Z","ABRAS","ABRASAR","ZZ","Z","NOVIO"};
+    dictionary = {"ABUELO","ARBOL","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
     // initialize the trie with words from dictionary
     Trie* trie = new Trie();
     for (int i = 0; i < dictionary.size(); ++i) {
         trie->insert(dictionary[i]);
     }
-    cout << "a" << endl;
+    cout << "1" << endl;
     // apply Patricia to trie
     trie->patricia();
-    cout << "b" << endl;
+    cout << "2" << endl;
 
     for(auto it = trie->children.begin(); it!=trie->children.end(); ++it) {
         cout << "ar: " << it->first << " val: " << it->second->word << endl;
+        cout << it->second->isCompleteWord << endl;
     }
 
     // find all the words

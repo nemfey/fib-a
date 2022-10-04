@@ -38,16 +38,16 @@ bool Trie::search(string key)
     // start from the root node
     Trie* curr = this;
     string s = "";
-    for (int i = 0; i < key.length(); i++)
-    {
+    for(int i=0; i<key.length(); ++i) {
         s.push_back(key[i]);
-
-        if(curr->children.find(s) != curr->children.end()) {
-            curr = curr->children.find(s)->second;
+        if(curr->existChildrenWithKey(s)) {
+            curr = curr->nodeWithKey(s);
             s = "";
         }
+        else if(!existsChildWithKeyPrefix(s)) {
+            return false;
+        }
     }
-    // mark the current node as a leaf
     return curr->isCompleteWord;
 }
 
@@ -61,23 +61,47 @@ Trie* Trie::nodeWithKey(string key) {
     return curr->children.find(key)->second;
 }
 
+bool Trie::existsChildWithKeyPrefix(string prefix) {
+    Trie* curr = this;
+    for(auto it = curr->children.begin(); it!=curr->children.end(); ++it) {
+        auto res = mismatch(prefix.begin(), prefix.end(), it->first.begin());
+        if(res.first==prefix.end()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
 void Trie::patricia() {
     Trie* curr = this;
+    //cout << "start!" << endl;
+    cout << "w: " << curr->word << endl;
     int nChildren = curr->numberChildren();
-    if(nChildren==1 and !curr->isCompleteWord) {
-        auto it = this->children.begin();
-        curr->word = curr->word + it->second->word; // curr value + son value
-        curr->isCompleteWord = it->second->isCompleteWord;
-        curr->children = it->second->children;  // children of the mixed value are the curr children
-    }
-    else {
-        for(auto it = curr->children.begin(); it!=curr->children.end(); ++it) {
-            it->second->patricia();
-            string newName = it->second->word;
-            Trie* newTrie = it->second;
-            curr->children.erase(it);
-            curr->children.insert({newName,newTrie});
+    cout << "ch: " << nChildren<< endl;
+    if (nChildren != 0) {
+        if(nChildren==1 and !curr->isCompleteWord) {
+            auto it = this->children.begin();
+            curr->word = curr->word + it->second->word; // curr value + son value
+            curr->isCompleteWord = it->second->isCompleteWord;  //If children was completeWord, this is also
+            curr->children = it->second->children;  // current children becomes children's children
+            curr->patricia();
+            cout << "after patricia: " << curr->word << endl;
+        }
+        else {
+            for(auto it = curr->children.begin(); it!=curr->children.end(); ++it) {
+                cout << "go backtracking" << endl;
+                cout << "next word: " << it->first << endl;
+                //cout << "sjdhsljhdslhdsl" << endl;
+                it->second->patricia();
+                cout << "end backtracking" << endl;
+                string newName = it->second->word;
+                Trie* newTrie = it->second;
+                curr->children.erase(it);
+                curr->children.insert({newName,newTrie});
+                //cout << "end for backtracking" << endl;
 
+            }
         }
     }
 }

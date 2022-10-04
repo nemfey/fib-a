@@ -25,6 +25,7 @@ class Trie {
         void insert(string);
         bool search(string);
         bool existChildrenWithKey(string);
+        bool existsChildWithKeyPrefix(string);
         Trie* nodeWithKey(string);
         void patricia();
 
