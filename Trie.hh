@@ -17,7 +17,7 @@ class Trie {
         // Constructor
         Trie()
         {
-            word = "";
+            word = "_";
             this->isCompleteWord = false;
             //this->children;
         }

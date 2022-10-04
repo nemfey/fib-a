@@ -40,7 +40,6 @@ void searchDictionaryWordsRec(WordSearch& wordSearch, BoolMatrix& visited, Trie*
     if(not visited[i][j]) {
         visited[i][j] = true;
         partialWord.push_back(wordSearch.toChar(i,j));
-        
         // comprobamos si existe la palabra completa en el diccionario
         if (dictionary->search(partialWord)) {
             auxPos.push_back({i,j});
@@ -67,18 +66,21 @@ void searchDictionaryWordsRec(WordSearch& wordSearch, BoolMatrix& visited, Trie*
             auxPos.pop_back();
         }
         else if(dictionary->existsChildWithKeyPrefix(partialWord)) {
+            auxPos.push_back({i,j});
             int nexti, nextj;
             for(int k = 0; k < 8; k++) {         
                 nexti = i + dirI[k];
                 nextj = j + dirJ[k];
                 finalWord.push_back(wordSearch.toChar(i,j));
-                partialWord = finalWord;
+                //partialWord.push_back(wordSearch.toChar(i,j));
                 if(wordSearch.posOk(nexti,nextj)) {
                     searchDictionaryWordsRec(wordSearch, visited, dictionary, result, auxPos, partialWord, finalWord, nexti, nextj);
                 }
                 finalWord.pop_back();
+                //partialWord.pop_back();
 
             }
+            auxPos.pop_back();
         }
 
         //}
@@ -109,7 +111,7 @@ void searchDictionaryWords(Trie*& dictionary, WordSearch& wordSearch, int i, int
 int main() {
     srand(time(NULL));
     
-    vector<string> dictionary = {"ABUELO", "ARBOL", "BALON", "BICICLETA", "COLILLA", "CHORRA", "DICCIONARIO", "DORMIR", "ELECTIRCO", "ESPANYA", "FAROLA", "FUENTE", "GATO", "GORILA", "HELICOPTERO", "HORMIGA", "IGUALAR", "ISLAM", "JUEGO", "JORDAN", "KIWI", "KILO", "LIBRA", "LIMON", "MONEDA", "MESA", "NORIA", "NUBE", "ORIFICIO", "OLER", "PALOMA", "PUEBLO", "QUESO", "QUERER", "RUIDO", "RUEGO", "SORIA", "SUERTE", "TIRAR", "TITAN", "UVA", "UMBRAL", "VACACIONES", "VOLVER", "WATERPOLO", "WIKI", "XAVI", "XINO", "YOGUR", "YAYO", "ZEBRA", "ZAPATO"};   
+    vector<string> dictionary = {"ABUELO", "ABUELA", "ARBOL", "BALON", "BICICLETA", "COLILLA", "CHORRA", "DICCIONARIO", "DORMIR", "ELECTIRCO", "ESPANYA", "FAROLA", "FUENTE", "GATO", "GORILA", "HELICOPTERO", "HORMIGA", "IGUALAR", "ISLAM", "JUEGO", "JORDAN", "KIWI", "KILO", "LIBRA", "LIMON", "MONEDA", "MESA", "NORIA", "NUBE", "ORIFICIO", "OLER", "PALOMA", "PUEBLO", "QUESO", "QUERER", "RUIDO", "RUEGO", "SORIA", "SUERTE", "TIRAR", "TITAN", "UVA", "UMBRAL", "VACACIONES", "VOLVER", "WATERPOLO", "WIKI", "XAVI", "XINO", "YOGUR", "YAYO", "ZEBRA", "ZAPATO"};   
     vector<string> words(20);
     chooseWordsFromDictionary(dictionary,words);
     
@@ -127,21 +129,15 @@ int main() {
     wordSearch.print();
 
     //dictionary = {"ARBOL","ABUELO","ABRA","ABRAZO","CARCEL","CARA","Z","ABRAS","ABRASAR","ZZ","Z","NOVIO"};
-    dictionary = {"ABUELO","ARBOL","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
+    //dictionary = {"ABUELO","ARBOL","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
     // initialize the trie with words from dictionary
     Trie* trie = new Trie();
     for (int i = 0; i < dictionary.size(); ++i) {
         trie->insert(dictionary[i]);
     }
-    cout << "1" << endl;
+    
     // apply Patricia to trie
     trie->patricia();
-    cout << "2" << endl;
-
-    for(auto it = trie->children.begin(); it!=trie->children.end(); ++it) {
-        cout << "ar: " << it->first << " val: " << it->second->word << endl;
-        cout << it->second->isCompleteWord << endl;
-    }
 
     // find all the words
     list<Result> wordsFound;

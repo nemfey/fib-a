@@ -17,17 +17,18 @@ int Trie::numberChildren() {
 void Trie::insert(string key)
 {
     // start from the root node
+    // s    o   p   a
     Trie* curr = this;
     string s = "";
     for (int i = 0; i < key.length(); i++)
     {
-        s.push_back(key[i]);
+        s = key[i];
         if(curr->children.find(s) == curr->children.end()) {
             curr->children.insert({s,new Trie()});
         }
         curr = curr->children.find(s)->second;
         curr->word = s; // node has value
-        s = ""; // insert only char
+        //s = ""; // insert only char
     }
     // mark the current node as a leaf
     curr->isCompleteWord = true;
@@ -75,10 +76,7 @@ bool Trie::existsChildWithKeyPrefix(string prefix) {
 
 void Trie::patricia() {
     Trie* curr = this;
-    //cout << "start!" << endl;
-    cout << "w: " << curr->word << endl;
     int nChildren = curr->numberChildren();
-    cout << "ch: " << nChildren<< endl;
     if (nChildren != 0) {
         if(nChildren==1 and !curr->isCompleteWord) {
             auto it = this->children.begin();
@@ -86,22 +84,18 @@ void Trie::patricia() {
             curr->isCompleteWord = it->second->isCompleteWord;  //If children was completeWord, this is also
             curr->children = it->second->children;  // current children becomes children's children
             curr->patricia();
-            cout << "after patricia: " << curr->word << endl;
         }
         else {
-            for(auto it = curr->children.begin(); it!=curr->children.end(); ++it) {
-                cout << "go backtracking" << endl;
-                cout << "next word: " << it->first << endl;
-                //cout << "sjdhsljhdslhdsl" << endl;
+            map<string,Trie*> newChildren;
+            for(auto it = curr->children.begin(); it!=curr->children.end();) {
                 it->second->patricia();
-                cout << "end backtracking" << endl;
                 string newName = it->second->word;
                 Trie* newTrie = it->second;
-                curr->children.erase(it);
-                curr->children.insert({newName,newTrie});
-                //cout << "end for backtracking" << endl;
-
+                //curr->children.insert({newName,newTrie});
+                curr->children.erase(it++);
+                newChildren.insert({newName,newTrie});
             }
+            curr->children = newChildren;
         }
     }
 }
