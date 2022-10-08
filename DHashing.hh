@@ -9,7 +9,7 @@ class DHashing {
         unsigned int hash1(string);
         unsigned int hash2(string);
         int size;
-        int mod_h2;
+        int offsetHash2;
     
     public:
         vector<string> hashTable;
@@ -24,4 +24,5 @@ class DHashing {
         void insert(string);
         unsigned int search(string);
         int getSize();
+        void setOffsetHash2(int);
 };
