@@ -25,64 +25,60 @@ unsigned int DHashing::hash2(string key) {
     // mod prime number smaller than table size
     unsigned int index = 7 - (hashVal%7);
     return index;
-
-    //return offsetHash2;
 }
 
 // PUBLIC FUNCTIONS 
-void DHashing::insert(string key)
+void DHashing::insert(const pair<string,bool>& key)
 {
-    int offset = 1;
-    int positions = 0;
-    unsigned int index_h1 = hash1(key);
-    unsigned int index_h2 = hash2(key);
-    unsigned int index = index_h1;
-    //cout << "INDEX: " << index << endl;
-    while(hashTable[index] != "-" and hashTable[index] != key) {
-        positions = offset++ * index_h2;
-        cout << offset << endl;
-        //offset++;
-        index = (index_h1+positions) % size;
-        //cout << "i: " << index << ", occup: " << hashTable[index] << endl;
-        //usleep(100000);
-    }
+    int posh1 = hash1(key.first);
+    int posh2 = hash2(key.first);
+    int index = 0;
+    bool posFound = false;
 
-    cout << "in position " << index << " word " << key << endl;
-    hashTable[index] = key;
-   /*
-    unsigned int hashKey = hash1(key);
-    //unsigned int stepSz = hash2(key);
-    unsigned int stepSz = hash2();
-    while(hashTable[hashKey] != "-" and hashTable[hashKey] != key) {
-        hashKey = (hashKey + stepSz) % size;
-        cout << "i: " << hashKey << ", occup: " << hashTable[hashKey] << endl;
-        usleep(100000);
+    //Encontar la pos adecuada con la fórmula Posición final = pos(Hashing 1) + i * pos(hashing 2)
+    //Iterando con la i
+    for (int i=1; i<=size and !posFound; ++i) {
+        index = (posh1 + i*posh2) % size;
+        if(hashTable[index].first=="-" or hashTable[index]==key) {
+            posFound = true;
+        }
     }
-    cout << "in position " << hashKey << " word " << key << endl;
-    hashTable[hashKey] = key;
-    */
     
+    if(posFound) hashTable[index] = key;
+    else cout << "No se ha podido poner la key" << endl;
 }
-/*
-unsigned int DHashing::search(string key)
-{
-    int offset = 2;
-    int index_h1 = hash1(key);
-    int index_h2 = hash2(key);
-    int index = index_h1;
-    while(hashTable[index] != "-" or hashTable[index] != key) {
-        int positions = offset * index_h2;
-        offset++;
-        index = (index_h1+positions) % size;
-    }
 
-    return index;
+bool DHashing::searchPrefixWord(const string key)
+{
+    int posh1 = hash1(key);
+    int posh2 = hash2(key);
+    int index = 0;
+    bool posFound = false;
+
+    for (int i=1; i<=size and !posFound; ++i) {
+        index = (posh1 + i*posh2) % size;
+        posFound = (hashTable[index].first==key);
+    }
+    
+    return posFound;
 }
-*/
+
+bool DHashing::searchFinalWord(const string key)
+{
+    int posh1 = hash1(key);
+    int posh2 = hash2(key);
+    int index = 0;
+    bool posFound = false;
+
+    for (int i=1; i<=size and !posFound; ++i) {
+        index = (posh1 + i*posh2) % size;
+        posFound = (hashTable[index].first==key && hashTable[index].second);
+    }
+    
+    return posFound;
+}
+
+
 int DHashing::getSize() {
     return size;
-}
-
-void DHashing::setOffsetHash2(int offset) {
-    offsetHash2 = offset;
 }

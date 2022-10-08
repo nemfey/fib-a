@@ -119,7 +119,7 @@ void WordSearch::print() {
         for (auto c: row) {
             if (j == 0) cout << i % 10 << " ";
             if (c == '*') {
-                randomChar = rand() % 26 + 65;
+                randomChar = rand() % 26 + 97;
                 cout << " " << char(randomChar);
                 wordSearch[i][j] = char(randomChar);
             }
