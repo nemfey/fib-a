@@ -20,13 +20,17 @@ class BloomFilter {
         //number of hash functions
         int k;
         
-        int charToInt(char a);
-        int fHash(int base, int exponent, int mod);
+        int stringToInt(const string& word);
+        int fHash0(int base, int exponent);
+        int fHash1(int prime, int sNum);
+        int fHash2(int prime, int sNum);
+        int fHash3(int prime, int sNum);
+        int fHash4(int prime, int sNum);
         
     public:
         BloomFilter(int n2, float p2);
         void insertWord(const string& word);
-        int search(const string& auxWord, int cont);
+        int search(const string& auxWord);
         void print(int i);
         int size();
 };

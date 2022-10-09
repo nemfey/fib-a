@@ -6,31 +6,86 @@
 using namespace std;
 
 vector<int> primeElevatedNumbers = {3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43};
-vector<int> primeModNumbers = {104551, 104561, 104579, 104593, 104597, 104623, 104639, 104651, 104659, 104677, 104681, 104683, 104693, 104701, 104707, 104711, 104717, 104723, 104729};
 
 vector<unsigned char> bitMask = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
 
 //private functions
 
-int BloomFilter::charToInt(char a) {
+int BloomFilter::stringToInt(const string& word) {
     
-    int nA = int(a);
-    return nA;
+    int num = 0, wordSize = word.size();
+    
+    for (int i = 0; i < wordSize; i++) {
+        
+        num = 37*num + int(word[i]);
+        num = num % m;
+    }
+    return num;
 }
 
 //exponenciació ràpida (O(logn))
-int BloomFilter::fHash(int base, int exponent, int mod) {
+int BloomFilter::fHash0(int base, int exponent) {
     
     if (exponent == 0) {
         
         return 1;
     }
     
-    unsigned int pow = fHash(base, exponent/2, mod);
+    unsigned int pow = fHash0(base, exponent/2);
     if (exponent%2 == 0) pow *= pow;
     else pow *= pow * base;
-    pow = pow % mod;
+    pow = pow % m;
     return pow;
+}
+
+int BloomFilter::fHash1(int prime, int sNum) {
+    
+    int num = 0;
+    
+    for (int i = 0; i < 10; i++) {
+        
+        num = prime*num + sNum;
+        num = num % m;
+    }
+    return num;
+}
+
+int BloomFilter::fHash2(int prime, int sNum) {
+    
+    unsigned int num = 0;
+    
+    for (int i = 0; i < 4; i++) {
+        
+        num = ((num<<prime)+num)^sNum;
+        num = num % m;
+    }
+    return num;
+}
+
+int BloomFilter::fHash3(int prime, int sNum) {
+    
+    unsigned int num = 0;
+    
+    for (int i = 0; i < 3; i++) {
+        
+        num = ((num<<prime)-num)+sNum;
+        num = num & num;
+        num = num % m;
+    }
+    return num;
+}
+
+int BloomFilter::fHash4(int prime, int sNum) {
+    
+    unsigned int num = 0;
+    
+    for (int i = 0; i < 5; i++) {
+        
+        num = ((num<<prime)+num)-sNum;
+        num = num | num;
+        num = num % m;
+    }
+    return num;
 }
 
 //public functions
@@ -48,51 +103,43 @@ BloomFilter::BloomFilter(int n2, float p2) {
 
 void BloomFilter::insertWord(const string& word) {
     
-    int wordSize = word.size();
-    int countChar = 0;
-    int numChar, numHash, posMask, posBit;
-    int j = 0, l = 0;
+    int numWord = stringToInt(word);
+    int numHash, posMask, posBit;
+    int j = 0;
     
-    for(int i = 0; i < k; i++, countChar++, j++, l++) {
+    for(int i = 0; i < k; i++, j++) {
         
-        if (countChar == wordSize) countChar = 0;
-        numChar = charToInt(word[countChar]);
         if (j == primeElevatedNumbers.size()) j = 0;
-        if (l == primeModNumbers.size()) l = 0;
-        numHash = fHash(primeElevatedNumbers[j], numChar, primeModNumbers[l]);
-        posMask = (numHash * m / primeModNumbers[l]) / 8;
-        posBit = int((numHash * m / primeModNumbers[l])) % 8;
+        if (i % 5 == 0) numHash = fHash0(primeElevatedNumbers[j], numWord);
+        else if (i % 5 == 1) numHash = fHash1(primeElevatedNumbers[j], numWord);
+        else if (i % 5 == 2) numHash = fHash2(primeElevatedNumbers[j], numWord);
+        else if (i % 5 == 3) numHash = fHash3(primeElevatedNumbers[j], numWord);
+        else numHash = fHash4(primeElevatedNumbers[j], numWord);
+        posMask = numHash / 8;
+        posBit = numHash % 8;
         mask[posMask] = mask[posMask] | bitMask[posBit];
     }
 }
 
-int BloomFilter::search(const string& auxWord, int cont) {
+int BloomFilter::search(const string& auxWord) {
     
-    cout << "auxWord " << auxWord << " cont " << cont << endl;
-    int auxWordSize = auxWord.size();
-    cout << "auxWordSize " << auxWordSize << endl;
-    int countChar = cont;
-    cout << "countChar " << countChar << endl;
-    int numChar, numHash, posMask, posBit;
-    int j = cont % primeElevatedNumbers.size(), l = cont % primeModNumbers.size();
-    cout << "j " << j << " l " << l << endl;
+    int numWord = stringToInt(auxWord);
+    int numHash, posMask, posBit;
+    int j = 0;
     
-    for(int i = cont; i < k; i++, countChar++, j++, l++) {
+    for(int i = 0; i < k; i++, j++) {
         
-        if (countChar == auxWordSize) countChar = 0;
-        numChar = charToInt(auxWord[countChar]);
         if (j == primeElevatedNumbers.size()) j = 0;
-        if (l == primeModNumbers.size()) l = 0;
-        numHash = fHash(primeElevatedNumbers[j], numChar, primeModNumbers[l]);
-        posMask = (numHash * m / primeModNumbers[l]) / 8;
-        posBit = int((numHash * m / primeModNumbers[l])) % 8;
-        if(!(mask[posMask] & bitMask[posBit])) {
-            
-            if (i > cont) return 1;
-            return 0;
-        }
+        if (i % 5 == 0) numHash = fHash0(primeElevatedNumbers[j], numWord);
+        else if (i % 5 == 1) numHash = fHash1(primeElevatedNumbers[j], numWord);
+        else if (i % 5 == 2) numHash = fHash2(primeElevatedNumbers[j], numWord);
+        else if (i % 5 == 3) numHash = fHash3(primeElevatedNumbers[j], numWord);
+        else numHash = fHash4(primeElevatedNumbers[j], numWord);
+        posMask = numHash / 8;
+        posBit = numHash % 8;
+        if(!(mask[posMask] & bitMask[posBit])) return 0;
     }
-    return 2;
+    return 1;
 }
 
 void BloomFilter::print (int i) {

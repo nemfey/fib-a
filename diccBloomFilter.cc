@@ -32,41 +32,56 @@ void chooseWordsFromDict(vector<string> dictionary, vector<string>& words) {
 }
 
 //recursive call
-void searchingWordsRec(BloomFilter& bloomFilter, WordSearch& wordSearch, int i, int j, list<Result>& result, BoolMatrix& visited, string& currentWord, PosChars& auxPos) {
+void searchingWordsRec(BloomFilter& bloomFilter, WordSearch& wordSearch, int i, int j, list<Result>& result, BoolMatrix& visited, string& currentWord, PosChars& auxPos, int cont) {
     
-    if(not visited[i][j]) {
+    //cout << "entra" << endl;
+    if(not visited[i][j] and cont <= 6) {
         
         visited[i][j] = true;
         //creamos string auxiliar para ver si el nuevo prefijo existe
         string auxWord = currentWord;
         auxWord.push_back(wordSearch.toChar(i,j));
-        int exists = bloomFilter.search(auxWord, auxWord.size()-1);
         int auxI, auxJ;
-        // existe la palabra entera
-        if (exists == 2) {
+        if (cont < 3) {
             
             auxPos.push_back({i,j});
-            result.push_back({auxWord,auxPos});
-            //llamada recursiva
             for(int k = 0; k < 8; k++) {
                 
                 auxI = i + dirI[k];
                 auxJ = j + dirJ[k];
-                if(wordSearch.posOk(auxI,auxJ)) searchingWordsRec(bloomFilter, wordSearch, auxI, auxJ, result, visited, auxWord, auxPos);
+                if(wordSearch.posOk(auxI,auxJ)) searchingWordsRec(bloomFilter, wordSearch, auxI, auxJ, result, visited, auxWord, auxPos, cont+1);
             }
             auxPos.pop_back();
         }
-        //existe el prefijo
-        else if (exists == 1){
+        else {
             
-            auxPos.push_back({i,j});
-            for(int k = 0; k < 8; k++) {
+            int exists = bloomFilter.search(auxWord);
+            // existe la palabra entera
+            if (exists == 1) {
                 
-                auxI = i + dirI[k];
-                auxJ = j + dirJ[k];
-                if(wordSearch.posOk(auxI,auxJ)) searchingWordsRec(bloomFilter, wordSearch, auxI, auxJ, result, visited, auxWord, auxPos);
+                auxPos.push_back({i,j});
+                result.push_back({auxWord,auxPos});
+                //llamada recursiva
+                for(int k = 0; k < 8; k++) {
+                    
+                    auxI = i + dirI[k];
+                    auxJ = j + dirJ[k];
+                    if(wordSearch.posOk(auxI,auxJ)) searchingWordsRec(bloomFilter, wordSearch, auxI, auxJ, result, visited, auxWord, auxPos, cont+1);
+                }
+                auxPos.pop_back();
             }
-            auxPos.pop_back();
+            //no existe la palabra
+            else {
+                
+                auxPos.push_back({i,j});
+                for(int k = 0; k < 8; k++) {
+                    
+                    auxI = i + dirI[k];
+                    auxJ = j + dirJ[k];
+                    if(wordSearch.posOk(auxI,auxJ)) searchingWordsRec(bloomFilter, wordSearch, auxI, auxJ, result, visited, auxWord, auxPos, cont+1);
+                }
+                auxPos.pop_back();
+            }
         }
         visited[i][j] = false;
     }
@@ -78,7 +93,7 @@ void searchingWords(BloomFilter& bloomFilter, WordSearch& wordSearch, int n, int
     BoolMatrix visited(n, BoolRow(n, false));
     string w = "";
     PosChars auxPos;
-    searchingWordsRec(bloomFilter, wordSearch, i, j, result, visited, w, auxPos);
+    searchingWordsRec(bloomFilter, wordSearch, i, j, result, visited, w, auxPos, 1);
 }
 
 int main() {
@@ -107,14 +122,16 @@ int main() {
     wordSearch.print();
     
     int dicSize = dictionary.size();
-    BloomFilter bloomFilter(dicSize,0.000039f); // p = 0.000039 (more p could cause inefficiency , but it could be something more) en el cas de 25500 palabras no habria fallos
+    BloomFilter bloomFilter(dicSize,0.0000039f); // min p = 0.0001 (por palabras de max tamaño 13)p = 0.000039 (more p could cause inefficiency , but it could be something more) en el cas de 25500 palabras no habria fallos
     
     for (int i = 0; i < dicSize; i++) bloomFilter.insertWord(dictionary[i]);
+    /*cout << endl;
+    for (int i = 0; i < bloomFilter.size(); i++) bloomFilter.print(i);*/
     
     list<Result> result;
-    for(int i = 0; i < 1; i++) {
+    for(int i = 0; i < n; i++) {
         
-        for(int j = 0; j < 5; j++) {
+        for(int j = 0; j < n; j++) {
             
             searchingWords(bloomFilter, wordSearch, n, i, j, result);
         }
@@ -135,4 +152,3 @@ int main() {
         cout << endl;
     }
 }
-// diccBloomFilter file
