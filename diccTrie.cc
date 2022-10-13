@@ -7,8 +7,8 @@
 #include <list>
 #include "wordSearch.hh"
 #include "Trie.hh"
-
-using namespace std;
+#include <chrono>
+using namespace std::chrono;
 
 //                  NO N NE E SE S SO O
 vector<int> dirI = {-1,0,1,1,1,0,-1,-1};
@@ -102,18 +102,20 @@ int main() {
     chooseWordsFromDictionary(dictionary,words);
     
     // initialize the word search
-    int n = rand() % 16 + 10;
+    //int n = rand() % 16 + 10;
+    int n = 10;
     WordSearch wordSearch(n);   
     for (int i = 0; i < 20; i++) {
         wordSearch.addWord(words[i]);
     }
 
-    int wordsSize = words.size();
-    for (int i = 0; i < wordsSize; i++) cout << words[i] << "  ";
-    cout << endl << endl;
+    //int wordsSize = words.size();
+    //for (int i = 0; i < wordsSize; i++) cout << words[i] << "  ";
+    //cout << endl << endl;
     // word search created
-    wordSearch.print();
+    //wordSearch.print();
 
+    auto start = high_resolution_clock::now();
     // initialize the trie with words from dictionary
     Trie* trie = new Trie();
     for (int i = 0; i < dictionary.size(); ++i) {
@@ -122,7 +124,10 @@ int main() {
     
     // apply Patricia to trie
     trie->patricia();
+    auto stop = high_resolution_clock::now();
+    auto duration_initalization = duration_cast<microseconds>(stop-start);
 
+    start = high_resolution_clock::now();
     // find all the words
     list<Result> wordsFound;
     for(int i = 0; i < n; i++) {      
@@ -130,9 +135,14 @@ int main() {
             searchDictionaryWords(trie, wordSearch, i, j, wordsFound);
         }
     }
-    
+    stop = high_resolution_clock::now();
+    auto duration_finding = duration_cast<microseconds>(stop-start);
+    cout << "initialization: " << duration_initalization.count() << endl;
+    cout << "finding: " << duration_finding.count() << endl;
+
     // print words found in the word search
-    cout << endl << "WORDS FOUND:" << endl;
+    /*
+    cout << endl << "WORDS FOUND: " << wordsFound.size() << endl;
     list<Result>::const_iterator it;
     for(it = wordsFound.begin(); it!= wordsFound.end(); ++it) {       
         Result r = *it;
@@ -144,4 +154,6 @@ int main() {
         }
         cout << endl;   
     }
+    */
+    cout << endl << "Words found: " << wordsFound.size() << endl;
 }
