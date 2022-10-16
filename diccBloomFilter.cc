@@ -17,6 +17,16 @@ vector<int> dirJ = {-1,-1,-1,0,1,1,1,0};
 
 typedef pair<string,PosChars> Result;
 
+bool dichotomousSearch(const string& auxWord, const vector<string>& dictionary, int left, int right) {
+    
+    if (left > right) return false;
+    int m = (left + right) / 2;
+    if (auxWord < dictionary[m]) return dichotomousSearch(auxWord, dictionary, left, m - 1);
+    else if (auxWord > dictionary[m]) return dichotomousSearch(auxWord, dictionary, m + 1, right);
+    //word found
+    return true;
+}
+
 // words must have 20 positions
 void chooseWordsFromDict(vector<string> dictionary, vector<string>& words) {
     
@@ -126,7 +136,7 @@ int main() {
     
     chooseWordsFromDict(dictionary,words);
     
-    int n = rand() % 16 + 10;
+    int n = rand() % 41 + 10;
     WordSearch wordSearch(n);
     
     // always 20 words to search
@@ -145,13 +155,13 @@ int main() {
     vector<BloomFilter> vBloomFilter(11);
     int dicSize = dictionary.size();
     //real words
-    vBloomFilter[10] = BloomFilter(dicSize, float(1/(dicSize*0.2)));
+    vBloomFilter[10] = BloomFilter(dicSize, float(1/(dicSize*1.0)));
     int setSize;
     for(int i = 0; i < 10; i++) {
         
         setSize = prefixes[i].size();
         //prefixes
-        vBloomFilter[i] = BloomFilter(setSize, float(1/(setSize*0.2)));
+        vBloomFilter[i] = BloomFilter(setSize, float(1/(setSize*1.0)));
     }
     
     for (int i = 0; i < dicSize; i++) vBloomFilter[10].insertWord(dictionary[i]);
@@ -171,6 +181,8 @@ int main() {
     }
     
     cout << endl << "WORDS FOUND" << endl << "------------------------------------------------------------" << endl;
+    double resultSize = result.size();
+    int cont = 0;
     list<Result>::const_iterator it;
     for(it = result.begin(); it!= result.end(); ++it) {
         
@@ -183,5 +195,9 @@ int main() {
             if(i != vsize -1) cout << " , ";
         }
         cout << endl;
+        if(dichotomousSearch(r.first, dictionary, 0, dictionary.size()-1)) ++cont;
     }
+    cout << endl;
+    double sol = double(cont/resultSize);
+    cout << "correctesa: " << sol << endl;
 }
