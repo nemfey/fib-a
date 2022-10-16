@@ -4,7 +4,7 @@
 #include <unistd.h>
 using namespace std;
 
-// PRIVATE FUNCTIONS
+// Private functions
 unsigned int DHashing::hash1(string key) {
     unsigned int hashVal = 0;
 
@@ -27,7 +27,7 @@ unsigned int DHashing::hash2(string key) {
     return index;
 }
 
-// PUBLIC FUNCTIONS 
+// Public functions
 void DHashing::insert(const pair<string,bool>& key)
 {
     int posh1 = hash1(key.first);
@@ -35,8 +35,7 @@ void DHashing::insert(const pair<string,bool>& key)
     int index = 0;
     bool posFound = false;
 
-    //Encontar la pos adecuada con la fórmula Posición final = pos(Hashing 1) + i * pos(hashing 2)
-    //Iterando con la i
+    // find pos with formula finalPos = pos(hash1) + i*pos(hash2)
     for (int i=1; i<=size and !posFound; ++i) {
         index = (posh1 + i*posh2) % size;
         if(hashTable[index].first=="-" or hashTable[index]==key) {
@@ -77,7 +76,6 @@ bool DHashing::searchFinalWord(const string key)
     
     return posFound;
 }
-
 
 int DHashing::getSize() {
     return size;

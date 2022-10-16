@@ -16,7 +16,7 @@ vector<int> dirJ = {-1,-1,-1,0,1,1,1,0};
 typedef pair<string,PosChars> Result;
 
 // words must have 20 positions
-void chooseWordsFromDict(vector<string> dictionary, vector<string>& words) {
+void chooseWordsFromDictionary(vector<string> dictionary, vector<string>& words) {
     
     int dicSize = dictionary.size();
     vector<int> positionsToChoose(dicSize);
@@ -36,33 +36,13 @@ void searchDictionaryWordsRec(WordSearch& wordSearch, BoolMatrix& visited, DHash
         visited[i][j] = true;
         partialWord.push_back(wordSearch.toChar(i,j));
 
-        // comprobamos si existe la palabra completa en el diccionario
+        // check wether if words exists in dictionary
         if (dictionary.searchFinalWord(partialWord)) {
             auxPos.push_back({i,j});
             finalWord.push_back(wordSearch.toChar(i,j));
             result.push_back({finalWord,auxPos});
             auxPos.pop_back();
         }
-        /*
-        else if(dictionary.searchPrefixWord(partialWord)) {
-            auxPos.push_back({i,j});
-            Trie* childrenDictionary = dictionary->nodeWithKey(partialWord);
-            int nexti, nextj;
-            // recursive call
-            for(int k = 0; k < 8; k++) {         
-                nexti = i + dirI[k];
-                nextj = j + dirJ[k];
-                string resetWord = "";
-                finalWord.push_back(wordSearch.toChar(i,j));
-                if(wordSearch.posOk(nexti,nextj)) {
-                    searchDictionaryWordsRec(wordSearch, visited, childrenDictionary, result, auxPos, resetWord, finalWord, nexti, nextj);
-                }
-                finalWord.pop_back();
-
-            }
-            auxPos.pop_back();
-        }
-        */
         else if(dictionary.searchPrefixWord(partialWord)) {
             auxPos.push_back({i,j});
             int nexti, nextj;
@@ -82,7 +62,7 @@ void searchDictionaryWordsRec(WordSearch& wordSearch, BoolMatrix& visited, DHash
     }
 }
 
-//first call to recursive searching words
+// first call to recursive searching words
 void searchingWords(WordSearch& wordSearch, DHashing& dictionary, int n, int i, int j, list<Result>& result) {
     
     BoolMatrix visited(n, BoolRow(n, false));
@@ -92,39 +72,35 @@ void searchingWords(WordSearch& wordSearch, DHashing& dictionary, int n, int i, 
 }
 
 int main() {
-    
     srand(time(NULL));
+    
     vector<string> dictionary;
     string w;
     while(cin>>w) {
         dictionary.push_back(w);
     }
-
-    //vector<string> dictionary = {"ABUELO", "ARBOL", "BALON", "BICICLETA", "COLILLA", "CHORRA", "DICCIONARIO", "DORMIR", "ELECTIRCO", "ESPANYA", "FAROLA", "FUENTE", "GATO", "GORILA", "HELICOPTERO", "HORMIGA", "IGUALAR", "ISLAM", "JUEGO", "JORDAN", "KIWI", "KILO", "LIBRA", "LIMON", "MONEDA", "MESA", "NORIA", "NUBE", "ORIFICIO", "OLER", "PALOMA", "PUEBLO", "QUESO", "QUERER", "RUIDO", "RUEGO", "SORIA", "SUERTE", "TIRAR", "TITAN", "UVA", "UMBRAL", "VACACIONES", "VOLVER", "WATERPOLO", "WIKI", "XAVI", "XINO", "YOGUR", "YAYO", "ZEBRA", "ZAPATO"};
+    
     vector<string> words(20);
+    chooseWordsFromDictionary(dictionary,words);
     
-    sort(dictionary.begin(), dictionary.end());
-    
-    chooseWordsFromDict(dictionary,words);
-    
+    // initialize the word search
     int n = rand() % 16 + 10;
-    WordSearch wordSearch(n);
-    
-    // always 20 words to search
-    for (int i = 0; i < 20; i++) {      
+    WordSearch wordSearch(n);   
+    for (int i = 0; i < 20; i++) {
         wordSearch.addWord(words[i]);
     }
 
-    sort(words.begin(), words.end());
     int wordsSize = words.size();
     for (int i = 0; i < wordsSize; i++) cout << words[i] << "  ";
     cout << endl << endl;
-    //aqui la sopa ya estaria creada y solo tocaria buscar las palabras
+
+    // word search created
     wordSearch.print();
+
+    // initialization started
     
     int len = 0;
     for(int i=0; i<dictionary.size(); ++i) len += dictionary[i].size();
-
     DHashing dHashing = DHashing(len);
 
     for(int i=0; i<dictionary.size(); ++i) {
@@ -137,27 +113,32 @@ int main() {
         }
     }
 
-    cout << "words inserted: " << dHashing.getSize() << endl;
+    // initialization ended
 
-    list<Result> result;
+    // finding started
+
+    list<Result> wordsFound;
     for(int i = 0; i < n; i++) {    
         for(int j = 0; j < n; j++) {     
-            searchingWords(wordSearch, dHashing, n, i, j, result);
+            searchingWords(wordSearch, dHashing, n, i, j, wordsFound);
         }
     }
+
+    // finding ended
     
-    cout << endl << "WORDS FOUND" << endl << "------------------------------------------------------------" << endl;
+    // print words found in the word search
+    cout << endl << "WORDS FOUND: " << wordsFound.size() << endl;
+    
     list<Result>::const_iterator it;
-    for(it = result.begin(); it!= result.end(); ++it) {
-        
+    for(it = wordsFound.begin(); it!= wordsFound.end(); ++it) {       
         Result r = *it;
         cout << r.first << " -> ";
         int vsize = r.second.size();
-        for (int i = 0; i < vsize; i++) {
-            
-            cout << '{' << r.second[i].first << ',' << r.second[i].second << "}";
+        for (int i = 0; i < vsize; i++) {            
+            cout << '{' << r.second[i].first << ',' << r.second[i].second << "} (" << wordSearch.toChar(r.second[i].first,r.second[i].second) << ")";
             if(i != vsize -1) cout << " , ";
         }
-        cout << endl;
+        cout << endl;   
     }
+    cout << endl << "Words found: " << wordsFound.size() << endl;
 }
