@@ -2,22 +2,17 @@
 #include <iostream>
 #include <string>
 using namespace std;
- 
-// Define the character size
-#define CHAR_SIZE 128
 
-// PRIVATE FUNCTIONS
+// Private functions
 int Trie::numberChildren() {
     Trie* curr = this;
     return curr->children.size();
 }
 
-// PUBLIC FUNCTIONS 
-// Iterative function to insert a key into a Trie
+// Public functions
 void Trie::insert(string key)
 {
     // start from the root node
-    // s    o   p   a
     Trie* curr = this;
     string s = "";
     for (int i = 0; i < key.length(); i++)
@@ -27,9 +22,8 @@ void Trie::insert(string key)
             curr->children.insert({s,new Trie()});
         }
         curr = curr->children.find(s)->second;
-        curr->word = s; // node has value
+        curr->word = s;
     }
-    // mark the current node as a leaf
     curr->isCompleteWord = true;
 }
 
@@ -79,9 +73,12 @@ void Trie::patricia() {
     if (nChildren != 0) {
         if(nChildren==1 and !curr->isCompleteWord) {
             auto it = this->children.begin();
-            curr->word = curr->word + it->second->word; // curr value + son value
-            curr->isCompleteWord = it->second->isCompleteWord;  //If children was completeWord, this is also
-            curr->children = it->second->children;  // current children becomes children's children
+            // curr value + son value
+            curr->word = curr->word + it->second->word;
+            // if children was completeWord, father is also
+            curr->isCompleteWord = it->second->isCompleteWord; 
+            // current children becomes children's children
+            curr->children = it->second->children;
             curr->patricia();
         }
         else {

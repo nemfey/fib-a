@@ -7,8 +7,8 @@
 #include <list>
 #include "wordSearch.hh"
 #include "Trie.hh"
-
-using namespace std;
+#include <chrono>
+using namespace std::chrono;
 
 //                  NO N NE E SE S SO O
 vector<int> dirI = {-1,0,1,1,1,0,-1,-1};
@@ -18,7 +18,6 @@ typedef pair<string,PosChars> Result;
 
 
 void chooseWordsFromDictionary(vector<string> dictionary, vector<string>& words) {
-    
     int dicSize = dictionary.size();
     vector<int> positionsToChoose(dicSize);
     for(int i=0; i<dicSize; ++i) positionsToChoose[i] = i;
@@ -31,12 +30,12 @@ void chooseWordsFromDictionary(vector<string> dictionary, vector<string>& words)
     }
 }
 
-// Recursive call
 void searchDictionaryWordsRec(WordSearch& wordSearch, BoolMatrix& visited, Trie*& dictionary, list<Result>& result, PosChars& auxPos, string partialWord, string finalWord, int i, int j) {   
     if(not visited[i][j]) {
         visited[i][j] = true;
         partialWord.push_back(wordSearch.toChar(i,j));
-        // comprobamos si existe la palabra completa en el diccionario
+
+        // check if complete word exists in the dictionary
         if (dictionary->search(partialWord)) {
             auxPos.push_back({i,j});
             finalWord.push_back(wordSearch.toChar(i,j));
@@ -47,6 +46,7 @@ void searchDictionaryWordsRec(WordSearch& wordSearch, BoolMatrix& visited, Trie*
             auxPos.push_back({i,j});
             Trie* childrenDictionary = dictionary->nodeWithKey(partialWord);
             int nexti, nextj;
+
             // recursive call
             for(int k = 0; k < 8; k++) {         
                 nexti = i + dirI[k];
@@ -61,9 +61,12 @@ void searchDictionaryWordsRec(WordSearch& wordSearch, BoolMatrix& visited, Trie*
             }
             auxPos.pop_back();
         }
+
         else if(dictionary->existsChildWithKeyPrefix(partialWord)) {
             auxPos.push_back({i,j});
             int nexti, nextj;
+
+            // recursive call
             for(int k = 0; k < 8; k++) {         
                 nexti = i + dirI[k];
                 nextj = j + dirJ[k];
@@ -81,7 +84,7 @@ void searchDictionaryWordsRec(WordSearch& wordSearch, BoolMatrix& visited, Trie*
     }
 }
 
-// First call to recursive searching words
+// first call to recursive searching words
 void searchDictionaryWords(Trie*& dictionary, WordSearch& wordSearch, int i, int j, list<Result>& result) {
     BoolMatrix visited(wordSearch.getSize(), BoolRow(wordSearch.getSize(), false));
     string finalWord, partialWord = "";
@@ -92,7 +95,12 @@ void searchDictionaryWords(Trie*& dictionary, WordSearch& wordSearch, int i, int
 int main() {
     srand(time(NULL));
     
-    vector<string> dictionary = {"ABUELO", "ABUELA", "ARBOL", "BALON", "BICICLETA", "COLILLA", "CHORRA", "DICCIONARIO", "DORMIR", "ELECTIRCO", "ESPANYA", "FAROLA", "FUENTE", "GATO", "GORILA", "HELICOPTERO", "HORMIGA", "IGUALAR", "ISLAM", "JUEGO", "JORDAN", "KIWI", "KILO", "LIBRA", "LIMON", "MONEDA", "MESA", "NORIA", "NUBE", "ORIFICIO", "OLER", "PALOMA", "PUEBLO", "QUESO", "QUERER", "RUIDO", "RUEGO", "SORIA", "SUERTE", "TIRAR", "TITAN", "UVA", "UMBRAL", "VACACIONES", "VOLVER", "WATERPOLO", "WIKI", "XAVI", "XINO", "YOGUR", "YAYO", "ZEBRA", "ZAPATO"};   
+    vector<string> dictionary;
+    string w;
+    while(cin>>w) {
+        dictionary.push_back(w);
+    }
+    
     vector<string> words(20);
     chooseWordsFromDictionary(dictionary,words);
     
@@ -106,28 +114,36 @@ int main() {
     int wordsSize = words.size();
     for (int i = 0; i < wordsSize; i++) cout << words[i] << "  ";
     cout << endl << endl;
+
     // word search created
     wordSearch.print();
 
-    // initialize the trie with words from dictionary
+    // initialzation started
+
+    // add to trie with words from dictionary
     Trie* trie = new Trie();
     for (int i = 0; i < dictionary.size(); ++i) {
         trie->insert(dictionary[i]);
     }
-    
     // apply Patricia to trie
     trie->patricia();
 
-    // find all the words
+    // initialization ended
+
+    // finding started
+
     list<Result> wordsFound;
     for(int i = 0; i < n; i++) {      
         for(int j = 0; j < n; j++) {           
             searchDictionaryWords(trie, wordSearch, i, j, wordsFound);
         }
     }
-    
+
+    //finding ended
+
     // print words found in the word search
-    cout << endl << "WORDS FOUND:" << endl;
+    cout << endl << "WORDS FOUND: " << wordsFound.size() << endl;
+    
     list<Result>::const_iterator it;
     for(it = wordsFound.begin(); it!= wordsFound.end(); ++it) {       
         Result r = *it;
@@ -139,4 +155,5 @@ int main() {
         }
         cout << endl;   
     }
+    cout << endl << "Words found: " << wordsFound.size() << endl;
 }
