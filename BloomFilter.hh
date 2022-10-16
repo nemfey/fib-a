@@ -22,12 +22,13 @@ class BloomFilter {
         
         int stringToInt(const string& word);
         int fHash0(int base, int exponent);
-        int fHash1(int prime, int sNum);
+        int fHash1(int prime, const string& word);
         int fHash2(int prime, int sNum);
         int fHash3(int prime, int sNum);
         int fHash4(int prime, int sNum);
         
     public:
+        BloomFilter();
         BloomFilter(int n2, float p2);
         void insertWord(const string& word);
         int search(const string& auxWord);

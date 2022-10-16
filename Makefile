@@ -3,7 +3,7 @@ OPCIONS = -D_GLIBCXX_DEBUG -O2 -Wall -Wextra -Werror -Wno-sign-compare -std=c++1
 diccBloomFilter.exe: diccBloomFilter.o wordSearch.o BloomFilter.o
 	g++ -o diccBloomFilter.exe diccBloomFilter.o wordSearch.o BloomFilter.o
 
-diccBloomFilter.o: diccBloomFilter.cc wordSearch.hh Trie.hh
+diccBloomFilter.o: diccBloomFilter.cc wordSearch.hh BloomFilter.hh
 	g++ -c diccBloomFilter.cc $(OPCIONS)
 
 diccTrie.exe: diccTrie.o wordSearch.o Trie.o

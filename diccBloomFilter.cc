@@ -5,6 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include <list>
+#include <set>
 #include "wordSearch.hh"
 #include "BloomFilter.hh"
 
@@ -32,30 +33,30 @@ void chooseWordsFromDict(vector<string> dictionary, vector<string>& words) {
 }
 
 //recursive call
-void searchingWordsRec(BloomFilter& bloomFilter, WordSearch& wordSearch, int i, int j, list<Result>& result, BoolMatrix& visited, string& currentWord, PosChars& auxPos, int cont) {
+void searchingWordsRec(vector<BloomFilter>& vBloomFilter, WordSearch& wordSearch, int i, int j, list<Result>& result, BoolMatrix& visited, string& currentWord, PosChars& auxPos, int cont) {
     
     //cout << "entra" << endl;
-    if(not visited[i][j] and cont <= 6) {
+    if(not visited[i][j]) {
         
         visited[i][j] = true;
         //creamos string auxiliar para ver si el nuevo prefijo existe
         string auxWord = currentWord;
         auxWord.push_back(wordSearch.toChar(i,j));
         int auxI, auxJ;
-        if (cont < 3) {
+        if (cont == 1) {
             
             auxPos.push_back({i,j});
             for(int k = 0; k < 8; k++) {
                 
                 auxI = i + dirI[k];
                 auxJ = j + dirJ[k];
-                if(wordSearch.posOk(auxI,auxJ)) searchingWordsRec(bloomFilter, wordSearch, auxI, auxJ, result, visited, auxWord, auxPos, cont+1);
+                if(wordSearch.posOk(auxI,auxJ)) searchingWordsRec(vBloomFilter, wordSearch, auxI, auxJ, result, visited, auxWord, auxPos, cont+1);
             }
             auxPos.pop_back();
         }
         else {
             
-            int exists = bloomFilter.search(auxWord);
+            int exists = vBloomFilter[10].search(auxWord);
             // existe la palabra entera
             if (exists == 1) {
                 
@@ -66,21 +67,27 @@ void searchingWordsRec(BloomFilter& bloomFilter, WordSearch& wordSearch, int i, 
                     
                     auxI = i + dirI[k];
                     auxJ = j + dirJ[k];
-                    if(wordSearch.posOk(auxI,auxJ)) searchingWordsRec(bloomFilter, wordSearch, auxI, auxJ, result, visited, auxWord, auxPos, cont+1);
+                    if(wordSearch.posOk(auxI,auxJ)) searchingWordsRec(vBloomFilter, wordSearch, auxI, auxJ, result, visited, auxWord, auxPos, cont+1);
                 }
                 auxPos.pop_back();
             }
-            //no existe la palabra
             else {
                 
-                auxPos.push_back({i,j});
-                for(int k = 0; k < 8; k++) {
+                int auxWordSize = auxWord.size();
+                if (auxWordSize > 10) exists = vBloomFilter[9].search(auxWord);
+                else exists = vBloomFilter[auxWordSize-2].search(auxWord);
+                //es un prefijo
+                if (exists == 1) {
                     
-                    auxI = i + dirI[k];
-                    auxJ = j + dirJ[k];
-                    if(wordSearch.posOk(auxI,auxJ)) searchingWordsRec(bloomFilter, wordSearch, auxI, auxJ, result, visited, auxWord, auxPos, cont+1);
+                    auxPos.push_back({i,j});
+                    for(int k = 0; k < 8; k++) {
+                        
+                        auxI = i + dirI[k];
+                        auxJ = j + dirJ[k];
+                        if(wordSearch.posOk(auxI,auxJ)) searchingWordsRec(vBloomFilter, wordSearch, auxI, auxJ, result, visited, auxWord, auxPos, cont+1);
+                    }
+                    auxPos.pop_back();
                 }
-                auxPos.pop_back();
             }
         }
         visited[i][j] = false;
@@ -88,19 +95,33 @@ void searchingWordsRec(BloomFilter& bloomFilter, WordSearch& wordSearch, int i, 
 }
 
 //first call to recursive searching words
-void searchingWords(BloomFilter& bloomFilter, WordSearch& wordSearch, int n, int i, int j, list<Result>& result) {
+void searchingWords(vector<BloomFilter>& vBloomFilter, WordSearch& wordSearch, int n, int i, int j, list<Result>& result) {
     
     BoolMatrix visited(n, BoolRow(n, false));
     string w = "";
     PosChars auxPos;
-    searchingWordsRec(bloomFilter, wordSearch, i, j, result, visited, w, auxPos, 1);
+    searchingWordsRec(vBloomFilter, wordSearch, i, j, result, visited, w, auxPos, 1);
 }
 
 int main() {
     
     srand(time(NULL));
     
-    vector<string> dictionary = {"ABUELO", "ARBOL", "BALON", "BICICLETA", "COLILLA", "CHORRA", "DICCIONARIO", "DORMIR", "ELECTIRCO", "ESPANYA", "FAROLA", "FUENTE", "GATO", "GORILA", "HELICOPTERO", "HORMIGA", "IGUALAR", "ISLAM", "JUEGO", "JORDAN", "KIWI", "KILO", "LIBRA", "LIMON", "MONEDA", "MESA", "NORIA", "NUBE", "ORIFICIO", "OLER", "PALOMA", "PUEBLO", "QUESO", "QUERER", "RUIDO", "RUEGO", "SORIA", "SUERTE", "TIRAR", "TITAN", "UVA", "UMBRAL", "VACACIONES", "VOLVER", "WATERPOLO", "WIKI", "XAVI", "XINO", "YOGUR", "YAYO", "ZEBRA", "ZAPATO"};
+    vector<string> dictionary;
+    vector<set<string>> prefixes(10);
+    string w;
+    string pre;
+    while(cin>>w) {
+        
+        dictionary.push_back(w);
+        int wSize = w.size();
+        for (int i = 2; i < wSize; i++) {
+            
+            pre = w.substr(0,i);
+            if (i > 10) prefixes[9].insert(pre);
+            else prefixes[i-2].insert(pre);
+        }
+    }
     vector<string> words(20);
     
     chooseWordsFromDict(dictionary,words);
@@ -121,10 +142,22 @@ int main() {
     //aqui la sopa ya estaria creada y solo tocaria buscar las palabras
     wordSearch.print();
     
+    vector<BloomFilter> vBloomFilter(11);
     int dicSize = dictionary.size();
-    BloomFilter bloomFilter(dicSize,0.0000039f); // min p = 0.0001 (por palabras de max tamaño 13)p = 0.000039 (more p could cause inefficiency , but it could be something more) en el cas de 25500 palabras no habria fallos
+    vBloomFilter[10] = BloomFilter(10*dicSize, float(1/(dicSize*0.2)));
+    int setSize;
+    for(int i = 0; i < 10; i++) {
+        
+        setSize = prefixes[i].size();
+        vBloomFilter[i] = BloomFilter(10*setSize, float(1/(setSize*0.2)));
+    }
     
-    for (int i = 0; i < dicSize; i++) bloomFilter.insertWord(dictionary[i]);
+    for (int i = 0; i < dicSize; i++) vBloomFilter[10].insertWord(dictionary[i]);
+    for (int i = 0; i < 10; i++) {
+        
+        setSize = prefixes[i].size();
+        for (auto it : prefixes[i]) vBloomFilter[i].insertWord(it);
+    }
     /*cout << endl;
     for (int i = 0; i < bloomFilter.size(); i++) bloomFilter.print(i);*/
     
@@ -133,7 +166,7 @@ int main() {
         
         for(int j = 0; j < n; j++) {
             
-            searchingWords(bloomFilter, wordSearch, n, i, j, result);
+            searchingWords(vBloomFilter, wordSearch, n, i, j, result);
         }
     }
     
