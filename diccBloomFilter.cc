@@ -145,13 +145,13 @@ int main() {
     vector<BloomFilter> vBloomFilter(11);
     int dicSize = dictionary.size();
     //real words
-    vBloomFilter[10] = BloomFilter(10*dicSize, float(1/(dicSize*0.2)));
+    vBloomFilter[10] = BloomFilter(dicSize, float(1/(dicSize*0.2)));
     int setSize;
     for(int i = 0; i < 10; i++) {
         
         setSize = prefixes[i].size();
         //prefixes
-        vBloomFilter[i] = BloomFilter(10*setSize, float(1/(setSize*0.2)));
+        vBloomFilter[i] = BloomFilter(setSize, float(1/(setSize*0.2)));
     }
     
     for (int i = 0; i < dicSize; i++) vBloomFilter[10].insertWord(dictionary[i]);

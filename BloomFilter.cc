@@ -43,7 +43,7 @@ void BloomFilter::insertWord(const string& word) {
     int numHash, posMask, posBit;
     int j = 0;
     
-    for(int i = 0; i < 1; i++, j++) {
+    for(int i = 0; i < k; i++, j++) {
         
         if (j == primeElevatedNumbers.size()) j = 0;
         numHash = fHash1(primeElevatedNumbers[j], word);
@@ -58,7 +58,7 @@ int BloomFilter::search(const string& auxWord) {
     int numHash, posMask, posBit;
     int j = 0;
     
-    for(int i = 0; i < 1; i++, j++) {
+    for(int i = 0; i < k; i++, j++) {
         
         if (j == primeElevatedNumbers.size()) j = 0;
         numHash = fHash1(primeElevatedNumbers[j], auxWord);
