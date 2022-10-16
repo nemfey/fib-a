@@ -68,13 +68,3 @@ int BloomFilter::search(const string& auxWord) {
     }
     return 1;
 }
-
-void BloomFilter::print (int i) {
-    
-    cout << int(mask[i]) << endl;
-}
-
-int BloomFilter::size() {
-    
-    return mask.size();
-}

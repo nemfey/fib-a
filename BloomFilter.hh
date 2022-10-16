@@ -27,8 +27,6 @@ class BloomFilter {
         BloomFilter(int n2, float p2);
         void insertWord(const string& word);
         int search(const string& auxWord);
-        void print(int i);
-        int size();
 };
 
 #endif
