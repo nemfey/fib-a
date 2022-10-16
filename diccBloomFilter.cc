@@ -144,11 +144,13 @@ int main() {
     
     vector<BloomFilter> vBloomFilter(11);
     int dicSize = dictionary.size();
+    //real words
     vBloomFilter[10] = BloomFilter(10*dicSize, float(1/(dicSize*0.2)));
     int setSize;
     for(int i = 0; i < 10; i++) {
         
         setSize = prefixes[i].size();
+        //prefixes
         vBloomFilter[i] = BloomFilter(10*setSize, float(1/(setSize*0.2)));
     }
     
@@ -158,8 +160,6 @@ int main() {
         setSize = prefixes[i].size();
         for (auto it : prefixes[i]) vBloomFilter[i].insertWord(it);
     }
-    /*cout << endl;
-    for (int i = 0; i < bloomFilter.size(); i++) bloomFilter.print(i);*/
     
     list<Result> result;
     for(int i = 0; i < n; i++) {
