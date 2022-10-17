@@ -5,8 +5,11 @@
 #include <vector>
 #include <algorithm>
 #include <list>
+#include <set>
 #include "wordSearch.hh"
 #include "DHashing.hh"
+#include <chrono>
+using namespace std::chrono;
 using namespace std;
 
 //                  NO N NE E SE S SO O
@@ -30,61 +33,105 @@ void chooseWordsFromDictionary(vector<string> dictionary, vector<string>& words)
     }
 }
 
-// Recursive call
-void searchDictionaryWordsRec(WordSearch& wordSearch, BoolMatrix& visited, DHashing& dictionary, list<Result>& result, PosChars& auxPos, string partialWord, string finalWord, int i, int j) {   
+//recursive call
+void searchDictionaryWordsRec(vector<DHashing>& dHashing, WordSearch& wordSearch, int i, int j, list<Result>& result, BoolMatrix& visited, string& currentWord, PosChars& auxPos, int cont) {
+    
+    //cout << "entra" << endl;
     if(not visited[i][j]) {
+        
         visited[i][j] = true;
-        partialWord.push_back(wordSearch.toChar(i,j));
-
-        // check wether if words exists in dictionary
-        if (dictionary.searchFinalWord(partialWord)) {
+        //creamos string auxiliar para ver si el nuevo prefijo existe
+        string auxWord = currentWord;
+        auxWord.push_back(wordSearch.toChar(i,j));
+        int auxI, auxJ;
+        if (cont == 1) {
+            
             auxPos.push_back({i,j});
-            finalWord.push_back(wordSearch.toChar(i,j));
-            result.push_back({finalWord,auxPos});
-            auxPos.pop_back();
-        }
-        else if(dictionary.searchPrefixWord(partialWord)) {
-            auxPos.push_back({i,j});
-            int nexti, nextj;
-            for(int k = 0; k < 8; k++) {         
-                nexti = i + dirI[k];
-                nextj = j + dirJ[k];
-                finalWord.push_back(wordSearch.toChar(i,j));
-                if(wordSearch.posOk(nexti,nextj)) {
-                    searchDictionaryWordsRec(wordSearch, visited, dictionary, result, auxPos, partialWord, finalWord, nexti, nextj);
-                }
-                finalWord.pop_back();
+            for(int k = 0; k < 8; k++) {
+                
+                auxI = i + dirI[k];
+                auxJ = j + dirJ[k];
+                if(wordSearch.posOk(auxI,auxJ)) searchDictionaryWordsRec(dHashing, wordSearch, auxI, auxJ, result, visited, auxWord, auxPos, cont+1);
             }
             auxPos.pop_back();
         }
-        partialWord.pop_back();
+        else {
+            
+            bool exists = dHashing[10].searchWord(auxWord);
+            // existe la palabra entera
+            if (exists) {
+                
+                auxPos.push_back({i,j});
+                result.push_back({auxWord,auxPos});
+                //llamada recursiva
+                for(int k = 0; k < 8; k++) {
+                    
+                    auxI = i + dirI[k];
+                    auxJ = j + dirJ[k];
+                    if(wordSearch.posOk(auxI,auxJ)) searchDictionaryWordsRec(dHashing, wordSearch, auxI, auxJ, result, visited, auxWord, auxPos, cont+1);
+                }
+                auxPos.pop_back();
+            }
+            else {
+                
+                int auxWordSize = auxWord.size();
+                if (auxWordSize > 10) exists = dHashing[9].searchWord(auxWord);
+                else exists = dHashing[auxWordSize-2].searchWord(auxWord);
+                // es un prefijo
+                if (exists) {
+                    
+                    auxPos.push_back({i,j});
+                    for(int k = 0; k < 8; k++) {
+                        
+                        auxI = i + dirI[k];
+                        auxJ = j + dirJ[k];
+                        if(wordSearch.posOk(auxI,auxJ)) searchDictionaryWordsRec(dHashing, wordSearch, auxI, auxJ, result, visited, auxWord, auxPos, cont+1);
+                    }
+                    auxPos.pop_back();
+                }
+            }
+        }
         visited[i][j] = false;
     }
 }
 
 // first call to recursive searching words
-void searchingWords(WordSearch& wordSearch, DHashing& dictionary, int n, int i, int j, list<Result>& result) {
+void searchingWords(WordSearch& wordSearch, vector<DHashing>& dictionary, int n, int i, int j, list<Result>& result) {
     
     BoolMatrix visited(n, BoolRow(n, false));
     string w = "";
     PosChars auxPos;
-    searchDictionaryWordsRec(wordSearch, visited, dictionary, result, auxPos, w, w, i, j);
+    searchDictionaryWordsRec(dictionary, wordSearch, i, j, result, visited, w, auxPos, 1);
 }
 
 int main() {
     srand(time(NULL));
     
     vector<string> dictionary;
+    vector<set<string>> prefixes(10);
+
     string w;
+    string pre;
+    auto start = high_resolution_clock::now();
     while(cin>>w) {
         dictionary.push_back(w);
+        int wSize = w.size();
+        for (int i = 2; i < wSize; i++) {
+            pre = w.substr(0,i);
+            if (i > 10) prefixes[9].insert(pre);
+            else prefixes[i-2].insert(pre);
+        }
     }
-    
+    auto stop = high_resolution_clock::now();
+    auto duration_prefix = duration_cast<microseconds>(stop-start);
+    cout << "prefix: " << duration_prefix.count() << endl;
+
     vector<string> words(20);
     chooseWordsFromDictionary(dictionary,words);
     
     // initialize the word search
     int n = rand() % 16 + 10;
+    n = 50;
     WordSearch wordSearch(n);   
     for (int i = 0; i < 20; i++) {
         wordSearch.addWord(words[i]);
@@ -98,35 +145,55 @@ int main() {
     wordSearch.print();
 
     // initialization started
+    start = high_resolution_clock::now();
     
-    int len = 0;
-    for(int i=0; i<dictionary.size(); ++i) len += dictionary[i].size();
-    DHashing dHashing = DHashing(len);
+    vector<DHashing> vDHashing(11);
+    int dicSize = dictionary.size();
+    //real words
+    vDHashing[10] = DHashing(dicSize);
+    int setSize;
 
-    for(int i=0; i<dictionary.size(); ++i) {
-        int wSize = dictionary[i].size();
-        string w = "";
-        for(int j=0; j<wSize; ++j) {
-            w.push_back(dictionary[i][j]);
-            pair<string,bool> p = make_pair(w,j==wSize-1);
-            dHashing.insert(p);
-        }
+    for(int i = 0; i < 10; i++) {
+        
+        setSize = prefixes[i].size();
+        //prefixes
+        vDHashing[i] = DHashing(setSize);
     }
 
+    // insert dictionary words
+    for (int i = 0; i < dicSize; i++) vDHashing[10].insert(dictionary[i]);
+
+
+
+    // insert prefixes in its correspondent DHashing vector
+    for (int i = 0; i < 10; i++) {
+        setSize = prefixes[i].size();
+        for (auto it : prefixes[i]) vDHashing[i].insert(it);
+    }
+
+
+    stop = high_resolution_clock::now();
+    auto duration_initalization = duration_cast<microseconds>(stop-start);
+    cout << "initialization: " << duration_initalization.count() << endl;
     // initialization ended
 
     // finding started
-
+    start = high_resolution_clock::now();
+    cout << "searching" << endl;
     list<Result> wordsFound;
     for(int i = 0; i < n; i++) {    
         for(int j = 0; j < n; j++) {     
-            searchingWords(wordSearch, dHashing, n, i, j, wordsFound);
+            searchingWords(wordSearch, vDHashing, n, i, j, wordsFound);
         }
     }
 
+    stop = high_resolution_clock::now();
+    auto duration_finding = duration_cast<milliseconds>(stop-start);
+    cout << "finding: " << duration_finding.count() << endl;
     // finding ended
     
     // print words found in the word search
+    /*
     cout << endl << "WORDS FOUND: " << wordsFound.size() << endl;
     
     list<Result>::const_iterator it;
@@ -141,4 +208,6 @@ int main() {
         cout << endl;   
     }
     cout << endl << "Words found: " << wordsFound.size() << endl;
+    */
+    
 }

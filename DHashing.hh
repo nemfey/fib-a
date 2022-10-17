@@ -11,17 +11,13 @@ class DHashing {
         int size;
     
     public:
-        vector<pair<string,bool>> hashTable;
+        vector<string> hashTable;
     
         // Constructor
-        DHashing(int n)
-        {
-            size = n;
-            hashTable = vector<pair<string,bool>>(n,make_pair("-",false));
-        }
+        DHashing();
+        DHashing(int n);
 
-        void insert(const pair<string,bool>&);
-        bool searchPrefixWord(const string);
-        bool searchFinalWord(const string);
+        void insert(const string);
+        bool searchWord(const string);
         int getSize();
 };
