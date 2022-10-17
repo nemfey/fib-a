@@ -11,3 +11,6 @@ Per l'executable del diccBloomFilter.cc
 
 Per l'executable del diccDHashing.cc
 ->	make diccDHashing.exe
+
+Per l'eliminació dels arxius .o i .exe generats
+->  make clean
