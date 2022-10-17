@@ -2,6 +2,12 @@ SuperSopa
 ===
 Proyecto de la asignatura GEI-A (2022-23 Q1)
 
+## Authors
+- [Mario Fernández](https://github.com/mariofernandezz)
+- [Pol Pérez](https://github.com/polpc146)
+- [Joan Sales](https://github.com/joanbros5)
+- [Victor Teixido](https://github.com/nemfey)
+
 ## Instrucciones para la ejecución del programa:
 
 Ejecutar el programa diccSortedVector.cc
