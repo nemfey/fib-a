@@ -1,7 +1,7 @@
 # SuperSopa
 proyecto de la asignatura de algoritmia
 
-## Instrucciones para la ejecución del programa:
+## Instrucciones para la ejecución del programa:
 
 Ejecutar el programa diccSortedVector.cc
     make diccSortedVector.exe
