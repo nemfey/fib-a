@@ -4,6 +4,14 @@
 #include <unistd.h>
 using namespace std;
 
+// Constructors
+DHashing::DHashing() {}
+
+DHashing::DHashing(int n) {
+    size = n;
+    hashTable = vector<string>(n,"-");
+}
+
 // Private functions
 unsigned int DHashing::hash1(string key) {
     unsigned int hashVal = 0;
@@ -28,26 +36,24 @@ unsigned int DHashing::hash2(string key) {
 }
 
 // Public functions
-void DHashing::insert(const pair<string,bool>& key)
+void DHashing::insert(const string key)
 {
-    int posh1 = hash1(key.first);
-    int posh2 = hash2(key.first);
+    int posh1 = hash1(key);
+    int posh2 = hash2(key);
     int index = 0;
-    bool posFound = false;
 
     // find pos with formula finalPos = pos(hash1) + i*pos(hash2)
-    for (int i=1; i<=size and !posFound; ++i) {
+    for (int i=1; i<=size; ++i) {
         index = (posh1 + i*posh2) % size;
-        if(hashTable[index].first=="-" or hashTable[index]==key) {
-            posFound = true;
+        if(hashTable[index]=="-" or hashTable[index]==key) {
+            //posFound = true;
+            hashTable[index] = key;
+            return;
         }
     }
-    
-    if(posFound) hashTable[index] = key;
-    else cout << "No se ha podido poner la key" << endl;
 }
 
-bool DHashing::searchPrefixWord(const string key)
+bool DHashing::searchWord(const string key)
 {
     int posh1 = hash1(key);
     int posh2 = hash2(key);
@@ -56,22 +62,7 @@ bool DHashing::searchPrefixWord(const string key)
 
     for (int i=1; i<=size and !posFound; ++i) {
         index = (posh1 + i*posh2) % size;
-        posFound = (hashTable[index].first==key);
-    }
-    
-    return posFound;
-}
-
-bool DHashing::searchFinalWord(const string key)
-{
-    int posh1 = hash1(key);
-    int posh2 = hash2(key);
-    int index = 0;
-    bool posFound = false;
-
-    for (int i=1; i<=size and !posFound; ++i) {
-        index = (posh1 + i*posh2) % size;
-        posFound = (hashTable[index].first==key && hashTable[index].second);
+        posFound = (hashTable[index]==key);
     }
     
     return posFound;
