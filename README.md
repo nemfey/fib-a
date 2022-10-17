@@ -1,5 +1,5 @@
 # SuperSopa
-proyecto de la asignatura de algoritmia
+Proyecto de la asignatura de algoritmia 2022/23 Q1
 
 ## Instrucciones para la ejecución del programa:
 
