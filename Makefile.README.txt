@@ -1,0 +1,13 @@
+Regles d'execució del Makefile:
+
+Per l'executable del diccSortedVector.cc
+->	make diccSortedVector.exe
+
+Per l'executable del diccTrie.cc
+->	make diccTrie.exe
+
+Per l'executable del diccBloomFilter.cc
+->	make diccBloomFilter.exe
+
+Per l'executable del diccDHashing.cc
+->	make diccDHashing.exe
