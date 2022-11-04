@@ -18,14 +18,14 @@ Ejecutar el programa diccSortedVector.cc
 
 Ejecutar el programa diccTrie.cc
 ```
-    make diccSortedVector.exe
-    ./diccSortedVector.exe < nombre_fichero_diccionario.txt
+    make diccTrie.exe
+    ./diccTrie.exe < nombre_fichero_diccionario.txt
 ```
 
 Ejecutar el programa diccBloomFilter.cc
 ```
-    make diccTrie.exe
-    ./diccTrie.exe < nombre_fichero_diccionario.txt
+    make diccBloomFilter.exe
+    ./diccBloomFilter.exe < nombre_fichero_diccionario.txt
 ```
 
 Ejecutar el programa diccDHashing.cc
